@@ -13,13 +13,18 @@ from time import sleep
 import re
 from multiprocessing import Pool
 import random
+import sqlite3
+
+NUM_THREADS = 20
+
 
 y = 0
 
 def scrape(url):
     try:
-        sleep(random.random())
-        response = requests.get(url, timeout = 45)
+        sleep(random.random() * 2 + 2)
+        response = requests.get(url, timeout = 45, headers={'referer': 'https://www.google.com'})
+        # response = requests.get('http://api.scraperapi.com', timeout = 45, params = {'api_key':'e7f8a201b10d57fd873c3cc984b694c0', 'url': url})
         content = BeautifulSoup(response.content, 'html.parser')
 
         global y
@@ -47,8 +52,9 @@ def scrape(url):
         html = str(content)
         price = re.search('var productData (.{0,5000})\"price\":{\"value\":\"(.{1,6})\"\,\"currencyCode\":\"USD\"}', html).group(2)
 
+        prodid = url[url.find('-prodid-')+8:]
 
-        return([title, price])
+        return([title, price,prodid])
     except:
         print('error', url)
 
@@ -62,7 +68,7 @@ if f.readline() != "completed\n":
 a = f.readline()
 urls = []
 
-p = Pool(10)
+p = Pool(NUM_THREADS)
 
 while a:
     urls.append('https://www.cvs.com' + a[:-1])
@@ -71,7 +77,7 @@ while a:
 x = []
 
 try:
-    x = p.map(scrape, urls)
+    x = p.map(scrape, urls[:1000])
 except Exception as e:
     print('error',e)
 except KeyboardInterrupt:
