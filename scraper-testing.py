@@ -7,9 +7,9 @@ categories = ['vitamins', 'home-health-care', 'health-medicine', 'personal-care'
 products = []
 
 def scrape(url, realItems, pages = False):
-    mpage = 0
+    mpages = 0
     response = requests.get(url, timeout = 15)
-    content = BeautifulSoup(response,.content, 'html.parser')
+    content = BeautifulSoup(response.content, 'html.parser')
 
     items = content.findAll('a', href = True)
 
@@ -21,9 +21,10 @@ def scrape(url, realItems, pages = False):
             if '?page=' in link['href']:
                 mpages = max(mpages, int(link['href'][link['href'].find('?page=') + 6:]))
 
-
-
-
+    if pages:
+        return(realItems, mpages)
+    else:
+        return(realItems)
 
 
 
@@ -32,33 +33,11 @@ for cat in categories:
     pages = 0
 
     # opening the page
-    url = "https://www.cvs.com/shop/" + cat + "?page=1"
-    response = requests.get(url, timeout = 5)
-    content = BeautifulSoup(response.content, "html.parser")
-
-
-    #finding all links to products in the first page, as well as the maximum page
-    items = content.findAll('a', href=True)
-
-    for link in items:
-
-        #finding the links for all the products
-        if 'prodid' in link['href'] and not 'reviews' in link['href']:
-            products.append(link['href'])
-
-        #finding the highest page number there is for this section
-        if '?page=' in link['href']:
-            pages = max(pages, int(link['href'][link['href'].find('?page=') + 6:]))
+    products, pages = scrape("https://www.cvs.com/shop/" + cat + "?page=1", products, True)
 
     for i in range(2, pages + 1):
-        url = 'https://www.cvs.com/shop/' + cat + '?page=' + str(i)
-        response = requests.get(url, timeout = 15)
-        content = BeautifulSoup(response.content, 'html.parser')
 
-        items = content.findAll('a', href=True)
-        for link in items:
-            if 'prodid' in link['href'] and not 'reviews' in link['href']:
-                products.append(link['href'])
+        products = scrape('https://www.cvs/com/shop/' + cat + '?pages=' + str(i), products)
 
         print(i, len(products))
 
