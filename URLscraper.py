@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup, SoupStrainer
+from bs4 import BeautifulSoup # , SoupStrainer
 import requests
 from time import sleep
 
