@@ -1,3 +1,10 @@
+'''
+
+This is used for testing errors that show up in the scraping of items. It allows you to manually check individual URLs to see if more cases need to be coded in.
+
+
+'''
+
 import re
 from bs4 import BeautifulSoup # , SoupStrainer
 import requests

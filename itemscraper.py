@@ -1,3 +1,12 @@
+'''
+
+This program opens output.txt, which contains the URLs to each item in the catalogue, and scrapes that URL for the price and name of the item. It then stores this in a database.
+
+improvements: include in store availability? optimize?
+
+
+'''
+
 from bs4 import BeautifulSoup # , SoupStrainer
 import requests
 from time import sleep

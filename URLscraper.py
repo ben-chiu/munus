@@ -1,3 +1,11 @@
+'''
+
+This program scrapes the catalogue of CVS by category to store the URL of each item. It removes duplicates as well.
+
+improvements: can be sped up with multithreading, although this may not be necessary because this only needs to be run occassionally.
+              optimize
+'''
+
 from bs4 import BeautifulSoup # , SoupStrainer
 import requests
 from time import sleep
