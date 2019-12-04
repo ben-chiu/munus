@@ -1,4 +1,5 @@
 import os
+import stripe
 
 from cs50 import SQL
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
@@ -12,6 +13,9 @@ from helpers import apology, login_required, lookup, usd
 
 # Configure application
 app = Flask(__name__)
+
+pub_key = "pk_test_aw8Q7dyf81YYvJSmX7dfFofO0041RjcEyL"
+secret_key = "sk_test_M67xEbjFWyt6I8TMlkI5t4R300QIwHpNvE"
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -259,13 +263,17 @@ def change():
         flash('Password Changed!')
         return redirect("/")
 
+@app.route("/payment", methods=["GET", "POST"])
+@login_required
+def change():
+    if request.method == "GET":
+        return render_template("payment.html", pub_key=pub_key)
 
 def errorhandler(e):
     """Handle error"""
     if not isinstance(e, HTTPException):
         e = InternalServerError()
     return apology(e.name, e.code)
-
 
 # Listen for errors
 for code in default_exceptions:
