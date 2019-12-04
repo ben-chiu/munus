@@ -1,0 +1,7 @@
+Product, price
+American Honey Pizza, 10.75
+Dirty Bird Pizza, 10.75
+Gnarlic Pizza, 10.75
+Lil Roni Pizza, 10.75
+Moonstruck Pizza, 10.75
+Maverick Pizza, 10.75

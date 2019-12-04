@@ -1,3 +1,4 @@
+Product, price
 American Linzer, 2.00
 Swiss Linzer, 2.25
 Swiss Nestle, 2.25
@@ -7,7 +8,7 @@ Leckerli, 6.00
 Leckerli Dipped, 6.25
 Biberli, 6.00
 Regular Coffee, 1.75
-Decaf Coffee 1.75
+Decaf Coffee, 1.75
 Espresso Swiss Style, 1.50
 Cappuccino, 2.75
 Latte, 3.25
