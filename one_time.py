@@ -16,7 +16,7 @@ if a == 'delete':
 
 if a == 'display':
     #for i in range(100):print(db.execute('SELECT * FROM products').fetchall()[:100][i])
-    print(db.execute("SELECT * FROM products WHERE store == 'animezakka';").fetchall())
+    print(db.execute("SELECT price FROM products WHERE store == 'animezakka';").fetchall())
 
 if a in ['&pizza', 'saloniki','swissbakers','animezakka','crimsoncorner']:
     f = open(a+'.txt', 'r')
