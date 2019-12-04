@@ -47,7 +47,7 @@ db = database.cursor()
 @app.route("/")
 @login_required
 def index():
-    return render_template("index.html")
+    return render_template("index.html", balance = session["balance"])
 
 @app.route("/history")
 @login_required
@@ -74,25 +74,28 @@ def login():
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
-        # Ensure username was submitted
-        if not request.form.get("username"):
-            return apology("must provide username", 403)
+        # Ensure email was submitted
+        if not request.form.get("email"):
+            return apology("must provide email", 403)
 
         # Ensure password was submitted
         elif not request.form.get("password"):
             return apology("must provide password", 403)
 
-        # Query database for username
-        statement = "SELECT * FROM users WHERE username = {0}".format(request.form.get("username"))
-        rows = db.execute(statement)
+        # Query database for email
+        statement = "SELECT * FROM users WHERE email = '{0}'".format(request.form.get("email"))
+        rows = db.execute(statement).fetchall()
 
-        # Ensure username exists and password is correct
-        if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
-            return apology("invalid username and/or password", 403)
+        # Ensure email exists and password is correct
+        if len(rows) != 1 or not check_password_hash(rows[0][2], request.form.get("password")):
+            return apology("invalid email and/or password", 403)
 
         # Remember which user has logged in
-        session["user_id"] = rows[0]["id"]
-        session["stripe_id"] = rows[0]["stripeID"]
+        session["user_id"] = rows[0][0]
+        session["stripe_id"] = rows[0][6]
+        statement = "SELECT money FROM users WHERE id = {0}".format(session["user_id"])
+        balance = db.execute(statement).fetchone()
+        session["balance"] = usd(balance[0])
 
         # Redirect user to home page
         return redirect("/")
@@ -121,7 +124,7 @@ def register():
         e = request.form.get("email")
         if not e:
             return apology("Must provide email", 403)
-        emails = db.execute("SELECT email FROM users").fetchall()  # list of dictionaries containing usernames
+        emails = db.execute("SELECT email FROM users").fetchall()  # list of dictionaries containing emails
         for d in emails:  # for a given dictionary
             if e == d[0]:  # check to see if already in use
                 return apology("Email already in use", 403)
@@ -143,9 +146,6 @@ def register():
         stripeid = cust["id"]
         hashval = generate_password_hash(password)
         statement = "INSERT INTO users (email, hash, building, room, stripeID) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}')".format(e, hashval, building, room, stripeid)
-        print('#############')
-        print(statement)
-        print('#############')
         db.execute(statement)
         flash('Registered!')
 
@@ -153,14 +153,14 @@ def register():
         statement = "SELECT id FROM users WHERE email='{0}'".format(e)
         session["user_id"] = db.execute(statement).fetchone()[0]
         session["stripe_id"] = stripeid
-        return redirect("/add")
+        session["balance"] = usd(0)
 
 
 @app.route("/add")
 @login_required
 def add():
     if request.method == "GET":
-        return render_template("add.html")
+        return render_template("add.html", balance=session["balance"])
 
 
 @app.route("/payment")
@@ -171,25 +171,28 @@ def payment():
     else:
         a = int(float(request.args.get("amount")) * 100)
         session["add"] = a
-        return render_template("payment.html", pub_key=pub_key, amount=a, dollars=usd(a/100))
+        return render_template("payment.html", pub_key=pub_key, amount=a, dollars=usd(a/100), balance=session["balance"])
 
 
 @app.route("/charge", methods=["POST"])
 @login_required
 def charge():
+    if request.method == "POST":
         a = session["add"]
         stripe.Customer.modify(session["stripe_id"], source=request.form["stripeToken"])
-        print(a)
         print(session["stripe_id"])
         print(request.form["stripeToken"])
         charge = stripe.Charge.create(customer = session["stripe_id"], amount = a, currency = "usd", description="Munus deposit")
         statement = "SELECT money FROM users WHERE id = {0}".format(session['user_id'])
         current = db.execute(statement).fetchone()[0]
         balance = current + a/100
+        session["balance"] = usd(balance)
         statement = "UPDATE users SET money = {0} WHERE id = {1}".format(balance, session['user_id'])
         db.execute(statement)
         flash("money added succesfully")
-        return render_template("success.html", amount=usd(a/100))
+        return render_template("success.html", amount=usd(a/100), balance=session["balance"])
+    else:
+        return apology("Invalid access to page", 403)
 
 @app.route("/success")
 @login_required
@@ -201,7 +204,7 @@ def success():
 @login_required
 def change():
     if request.method == "GET":
-        return render_template("change.html")
+        return render_template("change.html", balance=session["balance"])
     else:
         opassword = request.form.get("opassword")
         if not opassword:
