@@ -4,27 +4,31 @@
     Portfolio
 {% endblock %}
 
-{% block main %}
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Store</th>
-                <th>Product</th>
-                <th>Time</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in rows %}
-                <tr>
-                    <td>{{row[0]}}</td>    <!-- this part is incorrect -->
-                    <td>{{row[1]}}</td>
-                    <td>{{row[2]}}</td>
-                    <td>{{row[3]}}</td>
-                    <td>{{row[4]}}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% endblock %}
+{% if rows.length != 0 %}
+  {% block main %}
+      <table class="table table-striped">
+          <thead>
+              <tr>
+                  <b><th>Type</th></b>
+                  <th>Amount</th>
+                  <th>Store</th>
+                  <th>Product</th>
+                  <th>Time</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for row in rows %}
+                  <tr>
+                      <td>{{row[0]}}</td>    <!-- this part is incorrect -->
+                      <td>{{row[1]}}</td>
+                      <td>{{row[2]}}</td>
+                      <td>{{row[3]}}</td>
+                      <td>{{row[4]}}</td>
+                  </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+  {% endblock %}
+{% else %}
+  <p1>No transaction history yet!</p1>
+{% endif %}

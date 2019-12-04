@@ -59,8 +59,8 @@ def history():
     returns = []
     for row in rows:
         ret = [] # type, amt, store, productname
-        ret.append(row[0])
-        ret.append(row[2])
+        ret.append(row[0].upper())
+        ret.append('$'+format(row[2], ',.2f'))
         if row[0] not in ['deposit', 'withdrawal']:
             statement = "SELECT store FROM products WHERE id = {0}".format(row[1])
             ret.append(db.execute(statement).fetchone()[0])
@@ -71,6 +71,7 @@ def history():
             ret.append('')
         ret.append(row[3])
         returns.append(ret)
+    print(len(returns))
     return render_template("history.html", rows=returns)
 
 
@@ -164,6 +165,7 @@ def register():
         session["user_id"] = db.execute(statement).fetchone()[0]
         session["stripe_id"] = stripeid
         session["balance"] = usd(0)
+        return render_template('add.html')
 
 
 @app.route("/add")
@@ -201,7 +203,8 @@ def charge():
         statement = "UPDATE users SET money = {0} WHERE id = {1}".format(balance, session['user_id'])
         db.execute(statement)
         flash("money added succesfully")
-        statement = "INSERT INTO history (user_id, type, product_id, amount, timestamp) VALUES ({0}, deposit, -1, {1}, {2})".format(session['user_id'], a, datetime.now())
+        statement = "INSERT INTO history (user_id, type, product_id, amount, timestamp) VALUES ({0}, 'deposit', -1, {1}, '{2}')".format(session['user_id'], a/100, datetime.now())
+        print(statement)
         db.execute(statement)
 
         return render_template("success.html", amount=usd(a/100), balance=session["balance"])
@@ -226,7 +229,7 @@ def change():
 
         statement = "SELECT hash FROM users WHERE id = {0}".format(session["user_id"])
         h = db.execute(statement).fetchone()
-        if not check_password_hash(h[0]["hash"], opassword):
+        if not check_password_hash(h[0], opassword):
             return apology("Incorrect old password", 403)
         npassword = request.form.get("npassword")
         confirmation = request.form.get("confirmation")
@@ -237,7 +240,8 @@ def change():
         if not npassword == confirmation:
             return apology("Passwords do not match", 403)
         hashval = generate_password_hash(npassword)
-        statement = "UPDATE users SET hash= {0} WHERE id= {1}".format(hashval, session["user_id"])
+        statement = "UPDATE users SET hash= '{0}' WHERE id= {1}".format(hashval, session["user_id"])
+        print(statement)
         db.execute(statement)
         flash('Password Changed!')
         return redirect("/")
