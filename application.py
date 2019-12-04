@@ -42,6 +42,7 @@ Session(app)
 # Configure CS50 Library to use SQLite database
 database = sqlite3.connect('munus.db')
 db = database.cursor()
+db.autocommit = True
 
 @app.route("/")
 @login_required
@@ -284,3 +285,6 @@ def errorhandler(e):
 # Listen for errors
 for code in default_exceptions:
     app.errorhandler(code)(errorhandler)
+
+db.close()
+database.close()
