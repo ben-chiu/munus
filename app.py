@@ -55,6 +55,8 @@ def index():
 def history():
     statement = "SELECT type, product_id, amount, timestamp FROM history WHERE user_id={0}".format(session["user_id"])
     rows = db.execute(statement).fetchall()
+    print("****************")
+    print(rows)
 
     returns = []
     for row in rows:
@@ -71,8 +73,7 @@ def history():
             ret.append('')
         ret.append(row[3])
         returns.append(ret)
-    print(len(returns))
-    return render_template("history.html", rows=returns)
+    return render_template("history.html", rows=returns, balance=session["balance"])
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -166,6 +167,8 @@ def register():
         session["stripe_id"] = stripeid
         session["balance"] = usd(0)
         return render_template('add.html')
+
+        return redirect("/add", balance=session["balance"])
 
 
 @app.route("/add")

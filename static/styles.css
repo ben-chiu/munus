@@ -33,3 +33,13 @@ main img
     /* constrain images on small screens */
     max-width: 100%;
 }
+
+.registerform{
+  align-self: center;
+  text-align: left;
+  background-color: lightgrey;
+  border-style: solid;
+  border-color: #303944;
+  border-width: 10px;
+  padding: 50px;
+}
