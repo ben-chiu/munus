@@ -42,9 +42,9 @@
             <div class="collapse navbar-collapse" id="navbar">
                 {% if session.user_id %}
                     <ul class="navbar-nav mr-auto mt-2">
+                        <li class="nav-item"><a class="nav-link" href="/pickup">Pickup</a></li>
                         <li class="nav-item"><a class="nav-link" href="/order">Order</a></li>
                         <li class="nav-item"><a class="nav-link" href="/add">Add Money</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/history">History</a></li>
                     </ul>
                     <ul class="navbar-nav ml-auto mt-2">
                         <li class="nav-item"><a class="nav-link" href="/add">{{balance}}</a></li>
