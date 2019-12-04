@@ -6,7 +6,7 @@ db = database.cursor()
 a = input('what function do you want to do?')
 
 if a == 'create':
-    db.execute('CREATE TABLE history(user_id INTEGER UNIQUE, type TEXT, product_id INTEGER, amount INTEGER);')
+    db.execute('CREATE TABLE history(user_id INTEGER UNIQUE, type TEXT, product_id INTEGER, amount INTEGER, timestamp TIME);')
 
 if a == 'test':
     print(len(db.execute('SELECT * FROM products').fetchall()))
@@ -34,9 +34,9 @@ if a in ['&pizza', 'saloniki','swissbakers','animezakka','crimsoncorner']:
         b = f.readline()
 
 if a == 'a':
-    print(db.execute("SELECT * FROM products ORDER BY name LIMIT 1 OFFSET 1001").fetchone())
+    print(db.execute("ALTER TABLE history ADD timestamp TIME;"))
 
-if a == 'x':
+'''if a == 'x':
     for j in range(19988):
         statement1 = "SELECT name FROM products ORDER BY name LIMIT 1 OFFSET {0};".format(j)
         try:
@@ -50,4 +50,4 @@ if a == 'x':
                 print('error')
                 sleep(4)
         if j%1000 == 0:
-            print(j)
+            print(j)'''

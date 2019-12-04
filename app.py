@@ -10,6 +10,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 from helpers import apology, login_required, usd
 from flask import send_from_directory
+from datetime import datetime
 
 
 # Configure application
@@ -60,10 +61,15 @@ def history():
         ret = [] # type, amt, store, productname
         ret.append(row[0])
         ret.append(row[2])
-        statement = "SELECT store FROM products WHERE id = {0}".format(row[1])
-        ret.append(db.execute(statement).fetchone()[0])
-        statement = "SELECT name FROM products WHERE id = {0}".format(row[1])
-        ret.append(db.execute(statement).fetchone()[0])
+        if row[0] not in ['deposit', 'withdrawal']:
+            statement = "SELECT store FROM products WHERE id = {0}".format(row[1])
+            ret.append(db.execute(statement).fetchone()[0])
+            statement = "SELECT name FROM products WHERE id = {0}".format(row[1])
+            ret.append(db.execute(statement).fetchone()[0])
+        else:
+            ret.append('')
+            ret.append('')
+        ret.append(row[3])
         returns.append(ret)
     return render_template("history.html", rows=returns)
 
@@ -180,7 +186,7 @@ def payment():
 
 @app.route("/charge", methods=["POST"])
 @login_required
-def charge():
+def charge(): ''' might be incorrect with adding to history '''
     if request.method == "POST":
         a = session["add"]
         stripe.Customer.modify(session["stripe_id"], source=request.form["stripeToken"])
@@ -194,6 +200,9 @@ def charge():
         statement = "UPDATE users SET money = {0} WHERE id = {1}".format(balance, session['user_id'])
         db.execute(statement)
         flash("money added succesfully")
+        statement = "INSERT INTO history (user_id, type, product_id, amount, timestamp) VALUES ({0}, deposit, -1, {1}, {2})".format(session['user_id'], a, datetime.now())
+        db.execute(statement)
+
         return render_template("success.html", amount=usd(a/100), balance=session["balance"])
     else:
         return apology("Invalid access to page", 403)
