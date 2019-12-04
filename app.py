@@ -52,16 +52,20 @@ def index():
 @app.route("/history")
 @login_required
 def history():
-    statement = "SELECT symbol, shares, price, timestamp FROM transactions WHERE user_id={0}".format(session["user_id"])
-    rows = db.execute(statement)
+    statement = "SELECT type, product_id, amount, timestamp FROM history WHERE user_id={0}".format(session["user_id"])
+    rows = db.execute(statement).fetchall()
 
+    returns = []
     for row in rows:
-        row["price"] = usd(row["price"])
-        if row["shares"] > 0:
-            row["type"] = "Buy"
-        else:
-            row["type"] = "Sell"
-    return render_template("history.html", rows=rows)
+        ret = [] # type, amt, store, productname
+        ret.append(row[0])
+        ret.append(row[2])
+        statement = "SELECT store FROM products WHERE id = {0}".format(row[1])
+        ret.append(db.execute(statement).fetchone()[0])
+        statement = "SELECT name FROM products WHERE id = {0}".format(row[1])
+        ret.append(db.execute(statement).fetchone()[0])
+        returns.append(ret)
+    return render_template("history.html", rows=returns)
 
 
 @app.route("/login", methods=["GET", "POST"])

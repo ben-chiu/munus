@@ -17,11 +17,10 @@
         <tbody>
             {% for row in rows %}
                 <tr>
-                    <td>{{row["type"]}}</td>    <!-- this part is incorrect -->
-                    <td>{{row["symbol"]}}</td>
-                    <td>{{row["shares"]}}</td>
-                    <td>{{row["price"]}}</td>
-                    <td>{{row["timestamp"]}}</td>
+                    <td>{{row[0]}}</td>    <!-- this part is incorrect -->
+                    <td>{{row[1]}}</td>
+                    <td>{{row[2]}}</td>
+                    <td>{{row[3]}}</td>
                 </tr>
             {% endfor %}
         </tbody>
