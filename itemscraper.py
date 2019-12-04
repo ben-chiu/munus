@@ -41,14 +41,20 @@ def scrape(url):
 
         # tries to find the best title for an item
         title = str(content.find('title'))
-        title = title.replace('&amp;', '&')
+        title = title.replace('&amp;', '&').replace('\n', '')
+        if 'Online' in title:
+            return(None)
         if '(with Photos' in title:
-            title = title[title.index('>')+1:title.index('(with Photos')-1]
-        else:
-            if ':' in title:
-                title = title[title.index('>')+1:title.index(':')-1]
-            else:
-                title = title[title.index('>')+1:title.index('<')-1] # HAS ISSUE WITH NOT EXISTING STRING
+            title = title[:title.index('(with Photos')-1]
+        if ':' in title:
+            title = title[:title.index(':')-1]
+        if ' - ' in title:
+            title = title[:title.index(' - ')-1]
+        if '<' in title[1:]:
+            title = title[:title[1:].index('<')-1]
+        title = title[title.index('>')+1:]
+
+
 
         # uses regex to find the price of an item
         html = str(content)
@@ -56,9 +62,9 @@ def scrape(url):
 
         prodid = url[url.find('-prodid-')+8:]
 
-        return([title, price,prodid])
-    except:
-        print('error', url)
+        return([title, price])
+    except Exception as e:
+        print('error', e, url)
 
 
 f = open('output.txt', 'r')
@@ -79,7 +85,7 @@ while a:
 x = []
 
 try:
-    x = p.map(scrape, urls[:1000])
+    x = p.map(scrape, urls[:20])
 except Exception as e:
     print('error',e)
 except KeyboardInterrupt:
@@ -91,4 +97,22 @@ except KeyboardInterrupt:
 print(x)
 
 for i in x:
-    db.execute('INSERT INTO products (store, name, price) VALUES (:store, :name, :price)', store = "CVS", name = i[0], price = i[1])
+    if i:
+        '''query = 'INSERT INTO products (store, name, price) VALUES (%s,%s,%s);'
+        val = ('CVS', i[0], i[1])
+        db.execute(query, val)'''
+        i[0] = i[0].replace('\'', '\\\'').replace('\"', '\\\"')
+        try:
+            statement = "INSERT INTO products (store, name, price) VALUES ('{0}', \'{1}\', '{2}')".format('CVS', i[0], i[1])
+            db.execute(statement)
+            db.commit()
+        except Exception as e:
+            try:
+                statement = "INSERT INTO products (store, name, price) VALUES ('{0}', \"{1}\", '{2}')".format('CVS', i[0], i[1])
+                db.execute(statement)
+                db.commit()
+            except:
+                continue
+
+db.close()
+database.close()
