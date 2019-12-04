@@ -14,8 +14,10 @@ from helpers import apology, login_required, lookup, usd
 # Configure application
 app = Flask(__name__)
 
+# Set Stripe API keys
 pub_key = "pk_test_aw8Q7dyf81YYvJSmX7dfFofO0041RjcEyL"
 secret_key = "sk_test_M67xEbjFWyt6I8TMlkI5t4R300QIwHpNvE"
+stripe.api_key = secret_key
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -49,25 +51,7 @@ if not os.environ.get("API_KEY"):
 @app.route("/")
 @login_required
 def index():
-    # where I'll store all final data
-    rows = []
-    totalValue = 0
-    # gets list of all distinct stocks from transactions summing up shares
-    stocks = db.execute("SELECT symbol, SUM(shares) FROM transactions WHERE user_id=:user_id GROUP BY symbol",
-                        user_id=session["user_id"])
-    # goes through each stock, gathers info and puts it into rows
-    for stock in stocks:
-        if not stock["SUM(shares)"] == 0:
-            info = lookup(stock["symbol"])
-            currentValue = info["price"] * stock["SUM(shares)"]
-            totalValue += currentValue
-            # adding to rows
-            rows.append({"Symbol": stock["symbol"], "Name": info["name"], "Shares": stock["SUM(shares)"],
-                         "Price": usd(info["price"]), "TOTAL": usd(currentValue)})
-    # gets cash
-    cash = db.execute("SELECT cash FROM users WHERE id =:user_id", user_id=session["user_id"])[0]['cash']
-    totalValue += cash
-    return render_template("index.html", rows=rows, cashBalance=usd(cash), currentTotal=usd(totalValue))
+    return render_template("index.html")
 
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -138,6 +122,7 @@ def login():
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
+        session["stripe_id"] = rows[0]["stripeID"]
 
         # Redirect user to home page
         return redirect("/")
@@ -158,48 +143,81 @@ def logout():
     return redirect("/")
 
 
-@app.route("/quote", methods=["GET", "POST"])
-@login_required
-def quote():
-    if request.method == "GET":
-        return render_template("quote.html")
-    else:
-        symbol = request.form.get("symbol")
-        if not symbol:
-            return apology("Missing symbol")
-        info = lookup(symbol)
-        if not info:
-            return apology("Invalid Symbol", 403)
-        return render_template("quoted.html", name=info["name"], price=usd(info["price"]), symbol=info["symbol"])
-
-
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "GET":
         return render_template("register.html")
     else:
-        username = request.form.get("username")
-        if not username:
-            return apology("Must provide username", 403)
-        usernames = db.execute("SELECT username FROM users")  # list of dictionaries containing usernames
-        for d in usernames:  # for a given dictionary
-            if username == d['username']:  # check to see if already in use
-                return apology("Username is not available", 403)
-
+        e = request.form.get("email")
+        if not e:
+            return apology("Must provide email", 403)
+        emails = db.execute("SELECT email FROM users")  # list of dictionaries containing usernames
+        for d in emails:  # for a given dictionary
+            if e == d['email']:  # check to see if already in use
+                return apology("Email already in use", 403)
         password = request.form.get("password")
         confirmation = request.form.get("confirmation")
+        building = request.form.get("building")
+        room = request.form.get("room")
         if not password:
             return apology("Must provide password", 403)
         if not confirmation:
             return apology("Must confirm password", 403)
         if not password == confirmation:
             return apology("Passwords do not match", 403)
+        if not building:
+            return apology("Must provide building", 403)
+        if not room:
+            return apology("Must provide room number", 403)
+        cust = stripe.Customer.create(email=e)
+        stripeid = cust["id"]
         hashval = generate_password_hash(password)
-        db.execute("INSERT INTO users (username, hash) VALUES (:username, :hashval)", username=username, hashval=hashval)
-        session["user_id"] = db.execute("SELECT id FROM users WHERE username=:username", username=username)[0]["id"]
-        print(session["user_id"])
+        db.execute("INSERT INTO users (email, hash, building, room, stripeID) VALUES (:email, :hashval, :building, :room, :stripeID)", email=e, hashval=hashval, building=building, room=room, stripeID=stripeid)
         flash('Registered!')
-        return redirect("/")
+
+        # log the user in automatically after registration
+        session["user_id"] = db.execute("SELECT id FROM users WHERE email=:email", email=e)[0]["id"]
+        session["stripe_id"] = stripeid
+        return redirect("/add")
+
+
+@app.route("/add")
+@login_required
+def add():
+    if request.method == "GET":
+        return render_template("add.html")
+
+
+@app.route("/payment")
+@login_required
+def payment():
+    if not request.args.get("amount"):
+        return apology("Invalid access to page", 403)
+    else:
+        a = int(float(request.args.get("amount")) * 100)
+        session["add"] = a
+        return render_template("payment.html", pub_key=pub_key, amount=a, dollars=usd(a/100))
+
+
+@app.route("/charge", methods=["POST"])
+@login_required
+def charge():
+        a = session["add"]
+        stripe.Customer.modify(session["stripe_id"], source=request.form["stripeToken"])
+        print(a)
+        print(session["stripe_id"])
+        print(request.form["stripeToken"])
+        charge = stripe.Charge.create(customer = session["stripe_id"], amount = a, currency = "usd", description="Munus deposit")
+        current = db.execute("SELECT money FROM users WHERE id =:user_id", user_id=session["user_id"])[0]['money']
+        balance = current + a/100
+        db.execute("UPDATE users SET money = :value WHERE id=:user_id", value=balance, user_id=session["user_id"])
+        flash("Money added succesfully")
+        return render_template("success.html", amount=usd(a/100))
+
+@app.route("/success")
+@login_required
+def success():
+    return render_template("success.html")
 
 
 @app.route("/sell", methods=["GET", "POST"])
