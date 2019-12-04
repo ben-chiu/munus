@@ -1,6 +1,7 @@
 import os
 import stripe
 
+import sqlite3
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
 from flask_session import Session
 from tempfile import mkdtemp
@@ -40,7 +41,8 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///finance.db")
+database = sqlite3.connect('munus.db')
+db = database.cursor()
 
 # Make sure API key is set
 if not os.environ.get("API_KEY"):
