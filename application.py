@@ -3,13 +3,12 @@ import stripe
 
 import sqlite3
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
-from flask_session import Session
-from tempfile import mkdtemp
+#from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 
-from helpers import apology, login_required, lookup, usd
+from helpers import apology, login_required, usd
 
 # Configure application
 app = Flask(__name__)
@@ -35,19 +34,14 @@ def after_request(response):
 app.jinja_env.filters["usd"] = usd
 
 # Configure session to use filesystem (instead of signed cookies)
-app.config["SESSION_FILE_DIR"] = mkdtemp()
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
+#app.config["SESSION_FILE_DIR"] = mkdtemp()
+#app.config["SESSION_PERMANENT"] = False
+#app.config["SESSION_TYPE"] = "filesystem"
+#Session(app)
 
 # Configure CS50 Library to use SQLite database
 database = sqlite3.connect('munus.db')
 db = database.cursor()
-
-# Make sure API key is set
-if not os.environ.get("API_KEY"):
-    raise RuntimeError("API_KEY not set")
-
 
 @app.route("/")
 @login_required
@@ -266,7 +260,6 @@ def change():
         if not opassword:
             return apology("Must provide old password", 403)
         h = db.execute("SELECT hash FROM users WHERE id=:user_id", user_id=session["user_id"])
-        print(h)
         if not check_password_hash(h[0]["hash"], opassword):
             return apology("Incorrect old password", 403)
         npassword = request.form.get("npassword")
@@ -281,12 +274,6 @@ def change():
         db.execute("UPDATE users SET hash=:hashval WHERE id=:user_id", hashval=hashval, user_id=session["user_id"])
         flash('Password Changed!')
         return redirect("/")
-
-@app.route("/payment", methods=["GET", "POST"])
-@login_required
-def change():
-    if request.method == "GET":
-        return render_template("payment.html", pub_key=pub_key)
 
 def errorhandler(e):
     """Handle error"""
