@@ -12,7 +12,7 @@ if a == 'test':
     print(len(db.execute('SELECT * FROM products').fetchall()))
 
 if a == 'delete':
-    db.execute('DROP TABLE products')
+    db.execute('DROP TABLE users')
 
 if a == 'display':
     for i in range(100):print(db.execute('SELECT * FROM products').fetchall()[:100][i])
