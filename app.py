@@ -186,7 +186,8 @@ def payment():
 
 @app.route("/charge", methods=["POST"])
 @login_required
-def charge(): ''' might be incorrect with adding to history '''
+def charge():
+    ''' might be incorrect with adding to history '''
     if request.method == "POST":
         a = session["add"]
         stripe.Customer.modify(session["stripe_id"], source=request.form["stripeToken"])
