@@ -17,6 +17,8 @@ import sqlite3
 
 NUM_THREADS = 20
 
+database = sqlite3.connect('munus.db')
+db = database.cursor()
 
 y = 0
 
@@ -87,3 +89,6 @@ except KeyboardInterrupt:
     quit()
 
 print(x)
+
+for i in x:
+    db.execute('INSERT INTO products (store, name, price) VALUES (:store, :name, :price)', store = "CVS", name = i[0], price = i[1])
