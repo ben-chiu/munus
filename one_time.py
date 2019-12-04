@@ -6,7 +6,7 @@ db = database.cursor()
 a = input('what function do you want to do?')
 
 if a == 'create':
-    db.execute('CREATE TABLE orders(user_id INTEGER UNIQUE, email TEXT, hash TEXT, building TEXT, room TEXT, money DEFAULT 0, stripeID TEXT NOT NULL, PRIMARY KEY (id));')
+    db.execute('CREATE TABLE history(user_id INTEGER UNIQUE, type TEXT, product_id INTEGER, amount INTEGER);')
 
 if a == 'test':
     print(len(db.execute('SELECT * FROM products').fetchall()))
@@ -35,8 +35,6 @@ if a in ['&pizza', 'saloniki','swissbakers','animezakka','crimsoncorner']:
 
 if a == 'a':
     print(db.execute("SELECT * FROM products ORDER BY name LIMIT 1 OFFSET 1001").fetchone())
-
-
 
 if a == 'x':
     for j in range(19988):
