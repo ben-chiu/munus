@@ -17,7 +17,7 @@ import sqlite3
 
 NUM_THREADS = 20
 
-database = sqlite3.connect('munus.db')
+database = sqlite3.connect('munus.db', isolation_level = None)
 db = database.cursor()
 
 y = 0
@@ -30,7 +30,7 @@ def scrape(url):
         content = BeautifulSoup(response.content, 'html.parser')
 
         global y
-        print(y)
+        #print(y)
         y += 1
 
         x = open('temp.txt', 'w')
@@ -85,7 +85,7 @@ while a:
 x = []
 
 try:
-    x = p.map(scrape, urls[:20])
+    x = p.map(scrape, urls)
 except Exception as e:
     print('error',e)
 except KeyboardInterrupt:
@@ -105,14 +105,13 @@ for i in x:
         try:
             statement = "INSERT INTO products (store, name, price) VALUES ('{0}', \'{1}\', '{2}')".format('CVS', i[0], i[1])
             db.execute(statement)
-            db.commit()
         except Exception as e:
             try:
                 statement = "INSERT INTO products (store, name, price) VALUES ('{0}', \"{1}\", '{2}')".format('CVS', i[0], i[1])
                 db.execute(statement)
-                db.commit()
-            except:
-                continue
+            except Exception as e:
+                print('failure',e)
+#database.commit()
 
 db.close()
 database.close()

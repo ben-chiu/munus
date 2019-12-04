@@ -40,9 +40,9 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-database = sqlite3.connect('munus.db')
+database = sqlite3.connect('munus.db', isolation_level = None)
 db = database.cursor()
-db.autocommit = True
+
 
 @app.route("/")
 @login_required
