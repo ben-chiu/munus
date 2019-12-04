@@ -24,7 +24,7 @@ y = 0
 
 def scrape(url):
     try:
-        sleep(random.random() * 2 + 2)
+        sleep(random.random() * 2 + 1)
         response = requests.get(url, timeout = 45, headers={'referer': 'https://www.google.com'})
         # response = requests.get('http://api.scraperapi.com', timeout = 45, params = {'api_key':'e7f8a201b10d57fd873c3cc984b694c0', 'url': url})
         content = BeautifulSoup(response.content, 'html.parser')
