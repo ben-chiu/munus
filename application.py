@@ -4,7 +4,7 @@ import stripe
 import sqlite3
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
 from flask_session import Session
-#from tempfile import mkdtemp
+from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
@@ -36,13 +36,12 @@ app.jinja_env.filters["usd"] = usd
 
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_FILE_DIR"] = mkdtemp()
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-# Configure CS50 Library to use SQLite database
-database = sqlite3.connect('munus.db', isolation_level = None)
+database = sqlite3.connect('munus.db', isolation_level = None, check_same_thread = False)
 db = database.cursor()
-
 
 @app.route("/")
 @login_required
@@ -276,6 +275,30 @@ def change():
         flash('Password Changed!')
         return redirect("/")
 
+@app.route("/catalogue", methods=["GET", "POST"])
+@login_required
+def catalogue():
+    if request.method == "GET":
+        stores = db.execute("SELECT DISTINCT store FROM products")
+        render_template("catalogue.html")
+    else:
+        store = request.form.get("store")
+        rows = []
+        # gets list of all distinct stocks from transactions summing up shares
+        stocks = db.execute("SELECT symbol, SUM(shares) FROM transactions WHERE user_id=:user_id GROUP BY symbol",
+                            user_id=session["user_id"])
+        # goes through each stock, gathers info and puts it into rows
+        for stock in stocks:
+            if not stock["SUM(shares)"] == 0:
+                info = lookup(stock["symbol"])
+                currentValue = info["price"] * stock["SUM(shares)"]
+                totalValue += currentValue
+                # adding to rows
+                rows.append({"Symbol": stock["symbol"], "Name": info["name"], "Shares": stock["SUM(shares)"],
+                             "Price": usd(info["price"]), "TOTAL": usd(currentValue)})
+    # gets cash
+
+
 def errorhandler(e):
     """Handle error"""
     if not isinstance(e, HTTPException):
@@ -286,5 +309,5 @@ def errorhandler(e):
 for code in default_exceptions:
     app.errorhandler(code)(errorhandler)
 
-db.close()
-database.close()
+# db.close()
+# database.close()

@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Catalogue
+{% endblock %}
+
+{% block main %}
+    <h1>Catalogue</h1>
+    <p>
+        Browse our products by store!
+    </p>
+    <form action="/catlaogue" method="POST">
+        <div class="form-group">
+          <select name="store">
+            {% for store in stores %}
+            <option value="{{store}}">{{store}}</option>
+            {% endfor %}
+          </select>
+        </div>
+    </form>
+{% endblock %}
