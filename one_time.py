@@ -13,3 +13,6 @@ if a == 'test':
 
 if a == 'delete':
     db.execute('DROP TABLE products')
+
+if a == 'display':
+    for i in range(100):print(db.execute('SELECT * FROM products').fetchall()[:100][i])
