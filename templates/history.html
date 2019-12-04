@@ -9,16 +9,15 @@
         <thead>
             <tr>
                 <th>Type</th>
-                <th>Symbol</th>
-                <th>Shares</th>
-                <th>Price</th>
-                <th>Timestamp</th>
+                <th>Amount</th>
+                <th>Store</th>
+                <th>Product</th>
             </tr>
         </thead>
         <tbody>
             {% for row in rows %}
                 <tr>
-                    <td>{{row["type"]}}</td>
+                    <td>{{row["type"]}}</td>    <!-- this part is incorrect -->
                     <td>{{row["symbol"]}}</td>
                     <td>{{row["shares"]}}</td>
                     <td>{{row["price"]}}</td>

@@ -6,7 +6,7 @@ db = database.cursor()
 a = input('what function do you want to do?')
 
 if a == 'create':
-    db.execute('CREATE TABLE users(id INTEGER UNIQUE, email TEXT, hash TEXT, building TEXT, room TEXT, money DEFAULT 0, stripeID TEXT NOT NULL, PRIMARY KEY (id));')
+    db.execute('CREATE TABLE history(user_id INTEGER UNIQUE, type TEXT, product_id INTEGER, amount INTEGER);')
 
 if a == 'test':
     print(len(db.execute('SELECT * FROM products').fetchall()))
@@ -15,8 +15,8 @@ if a == 'delete':
     db.execute('DROP TABLE users')
 
 if a == 'display':
-    #for i in range(100):print(db.execute('SELECT * FROM products').fetchall()[:100][i])
-    print(db.execute("SELECT price FROM products WHERE store == 'animezakka';").fetchall())
+    for i in range(100):print(db.execute('SELECT * FROM products').fetchall()[:100][i])
+    #print(db.execute("SELECT * FROM products WHERE store == 'animezakka';").fetchall()[:10])
 
 if a in ['&pizza', 'saloniki','swissbakers','animezakka','crimsoncorner']:
     f = open(a+'.txt', 'r')
@@ -32,3 +32,22 @@ if a in ['&pizza', 'saloniki','swissbakers','animezakka','crimsoncorner']:
         except Exception as e:
             print(e)
         b = f.readline()
+
+if a == 'a':
+    print(db.execute("SELECT * FROM products ORDER BY name LIMIT 1 OFFSET 1001").fetchone())
+
+if a == 'x':
+    for j in range(19988):
+        statement1 = "SELECT name FROM products ORDER BY name LIMIT 1 OFFSET {0};".format(j)
+        try:
+            statement = "UPDATE products SET id = {0} WHERE name = \"{1}\";".format(j, db.execute(statement1).fetchone()[0])
+            db.execute(statement)
+        except:
+            try:
+                statement = "UPDATE products SET id = {0} WHERE name = '{1}';".format(j, db.execute(statement1).fetchone()[0])
+                db.execute(statement)
+            except Exception as e:
+                print('error')
+                sleep(4)
+        if j%1000 == 0:
+            print(j)
