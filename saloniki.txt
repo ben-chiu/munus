@@ -1,0 +1,28 @@
+Product, price
+Herc Pita, 9.79
+Niko Pita, 9.79
+George Pita, 9.79
+Souvlaki Pita, 7.79
+Despena Pita, 8.79
+Athena Pita, 9.79
+Impossible Pita, 10.79
+Chicken Plate, 13.59
+Pork Plate, 13.59
+Roasted Vegetables & Halloumi Plate, 13.59
+Lamb Plate, 13.59
+Zucchini Fritters, 11.59
+Impossible Meatballs, 13.59
+Souvlaki Classic, 9.39
+Souvlaki Double Classic, 13.39
+Mixed Grill, 29.39
+Big Classic, 46.39
+Greek Fries, 3
+Grilled Halloumi, 6
+Greek Hummus, 6
+Zucchini Feta Fritters Side, 5
+Greens & Cheese Phyllo Pie, 7
+Lamb Meatballs, 5
+Mt. Olympus Salad, 11.59
+Village Salad, 9
+Mykonos, 10.59
+Fall Salad, 9

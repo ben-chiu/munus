@@ -1,0 +1,7 @@
+Product, price
+American Honey, 10.75
+Dirty Bird, 10.75
+Gnarlic, 10.75
+Lil Roni, 10.75
+Moonstruck, 10.75
+Maverick, 10.75

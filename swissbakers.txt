@@ -1,0 +1,37 @@
+American Linzer, 2.00
+Swiss Linzer, 2.25
+Swiss Nestle, 2.25
+Coconut Macaroon, 6.00
+Coconut Macaroon Dipped, 6.25
+Leckerli, 6.00
+Leckerli Dipped, 6.25
+Biberli, 6.00
+Regular Coffee, 1.75
+Decaf Coffee 1.75
+Espresso Swiss Style, 1.50
+Cappuccino, 2.75
+Latte, 3.25
+Cafe Creme, 3.25
+Tea, 1.75
+Hot Chocolate, 2.00
+Pajazza - Plain, 3.75
+Pajazza - Seeded, 3.75
+Pajazza - Dark, 3.75
+Pajazza - Multigrain, 4.25
+Swiss Challah, 5.50
+Swiss Zopf, 5.50
+Zöpfli, 1.95
+Pretzel Roll, 1.25
+Pretzel Baguette, 2.75
+Pretzel, 3.50
+Pretzel Longstix, 1.35
+Party Pretzel, 12.00
+Ham & Swiss Croissant, 3.00
+Spinach Quiche, 3.50
+Apple, 3.50
+Cheese, 4.50
+Soup of the Day, 5.50
+Salami & Pickles Pretzel Baguette Sandwich Regular, 7.00
+Salami & Pickles Pretzel Baguette Sandwich Small, 3.75
+Pesto Pretzel Baguette Sandwich Regular, 7.00
+Pesto Pretzel Baguette Sandwich Small, 3.75
