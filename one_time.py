@@ -15,7 +15,7 @@ if a == 'delete':
     db.execute('DROP TABLE users')
 
 if a == 'display':
-    for i in range(100):print(db.execute('SELECT * FROM products').fetchall()[:100][i])
+    for i in range(100):print(db.execute('SELECT * FROM products').fetchall()[:10000][i])
     #print(db.execute("SELECT * FROM products WHERE store == 'animezakka';").fetchall()[:10])
 
 if a in ['&pizza', 'saloniki','swissbakers','animezakka','crimsoncorner']:

@@ -72,6 +72,8 @@ def history():
         ret.append(row[3])
         returns.append(ret)
     print(len(returns))
+    if len(returns) == 0:
+        return render_template("history.html", rows = 0)
     return render_template("history.html", rows=returns)
 
 
