@@ -266,11 +266,20 @@ def catalogue():
         stores = [i[0] for i in storelist]
 
         store = request.form.get("store")
-        statement = "SELECT name, price FROM products WHERE store='{0}';".format(store)
+        statement = "SELECT name, price, id FROM products WHERE store='{0}';".format(store)
         productlist = db.execute(statement).fetchall()
         names =[j[0] for j in productlist]
         prices = [j[1] for j in productlist]
-        return render_template("catalogue.html", stores = stores, store = store, names=names, prod = True, prices = prices, balance=session["balance"])
+        product_ids = ['/order?id='+str(j[2]) for j in productlist]
+        return render_template("catalogue.html", stores = stores, product_ids = product_ids, store = store, names=names, prod = True, prices = prices, balance=session["balance"])
+
+@app.route("/order", methods = ["GET", "POST"])
+@login_required
+def order():
+    item = request.args.get("id")
+    return render_template("order.html", item = item)
+
+
 
 
 def errorhandler(e):
