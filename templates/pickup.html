@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Pickup
+{% endblock %}
+
+{% block main %}
+<h2>Pickup</h2><br>
+<h4>Current Orders</h4>
+<table class = "table table-striped">
+  <tr>
+    <th>Store</th>
+    <th>Product</th>
+    <th>Timeframe</th>
+    <th>Delivery Bonus</th>
+{% for i in range(names|length) %}
+    <tr>
+      <td class = "align">{{stores[i]}}</td>
+      <td class = "align">{{products[i]}}</td>
+      <td class = "align">{{timeframes[i]}}<td>
+      <td class = "align">{{delivery bonus[i]}}<td>
+    <tr>
+{% endfor %}
+</table>
+{% endblock %}

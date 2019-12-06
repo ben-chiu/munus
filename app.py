@@ -169,9 +169,7 @@ def register():
         session["user_id"] = db.execute(statement).fetchone()[0]
         session["stripe_id"] = stripeid
         session["balance"] = usd(0)
-        return render_template('add.html')
-
-        return redirect("/add", balance=session["balance"])
+        return redirect("/add")
 
 
 @app.route("/add")
@@ -199,8 +197,6 @@ def charge():
     if request.method == "POST":
         a = session["add"]
         stripe.Customer.modify(session["stripe_id"], source=request.form["stripeToken"])
-        print(session["stripe_id"])
-        print(request.form["stripeToken"])
         charge = stripe.Charge.create(customer = session["stripe_id"], amount = a, currency = "usd", description="Munus deposit")
         statement = "SELECT money FROM users WHERE id = {0}".format(session['user_id'])
         current = db.execute(statement).fetchone()[0]
@@ -210,7 +206,6 @@ def charge():
         db.execute(statement)
         flash("money added succesfully")
         statement = "INSERT INTO history (user_id, type, product_id, amount, timestamp) VALUES ({0}, 'deposit', -1, {1}, '{2}')".format(session['user_id'], a/100, datetime.now())
-        print(statement)
         db.execute(statement)
 
         return render_template("success.html", amount=usd(a/100), balance=session["balance"])
@@ -272,6 +267,25 @@ def catalogue():
         prices = [j[1] for j in productlist]
         return render_template("catalogue.html", stores = stores, store = store, names=names, prod = True, prices = prices, balance=session["balance"])
 
+@app.route("/pickup", methods=["GET", "POST"])
+@login_required
+def pickup():
+    if request.method == "GET":
+        statement = "SELECT store, name, price, wtp, expir FROM orders JOIN products ON product_id=id"
+        infoList = db.execute(statement).fetchall()
+        print(infoList)
+        return render_template("pickup.html", balance=session["balance"])
+    else:
+        statement = "SELECT DISTINCT store FROM products"
+        storelist = db.execute(statement).fetchall()
+        stores = [i[0] for i in storelist]
+
+        store = request.form.get("store")
+        statement = "SELECT name, price FROM products WHERE store='{0}';".format(store)
+        productlist = db.execute(statement).fetchall()
+        names =[j[0] for j in productlist]
+        prices = [j[1] for j in productlist]
+        return render_template("catalogue.html", stores = stores, store = store, names=names, prod = True, prices = prices, balance=session["balance"])
 
 def errorhandler(e):
     """Handle error"""
