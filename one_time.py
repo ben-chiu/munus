@@ -6,13 +6,13 @@ db = database.cursor()
 a = input('what function do you want to do?')
 
 if a == 'create':
-    db.execute('CREATE TABLE history(user_id INTEGER UNIQUE, type TEXT, product_id INTEGER, amount INTEGER, timestamp TIME);')
+    db.execute('CREATE TABLE history(user_id INTEGER, type TEXT, product_id INTEGER, amount INTEGER, timestamp TIME);')
 
 if a == 'test':
     print(len(db.execute('SELECT * FROM products').fetchall()))
 
-if a == 'delete':
-    db.execute('DROP TABLE users')
+if a == 'unique':
+    db.execute("DROP TABLE history")
 
 if a == 'display':
     for i in range(100):print(db.execute('SELECT * FROM products').fetchall()[:10000][i])
