@@ -98,7 +98,7 @@ def login():
             return apology("must provide password", 403)
 
         # Query database for email
-        statement = "SELECT * FROM users WHERE email = '{0}'".format(request.form.get("email"))
+        statement = "SELECT * FROM users WHERE email = '{0}'".format(request.form.get("email").lower())
         rows = db.execute(statement).fetchall()
 
         # Ensure email exists and password is correct
@@ -136,7 +136,7 @@ def register():
     if request.method == "GET":
         return render_template("register.html")
     else:
-        e = request.form.get("email")
+        e = request.form.get("email").lower()
         if not e:
             return apology("Must provide email", 403)
         emails = db.execute("SELECT email FROM users").fetchall()  # list of dictionaries containing emails
