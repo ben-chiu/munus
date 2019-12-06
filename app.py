@@ -184,8 +184,8 @@ def add():
 @app.route("/payment")
 @login_required
 def payment():
-    if not request.args.get("amount"):
-        return apology("Invalid access to page", 403)
+    if not request.args.get("amount") or int(request.args.get("amount"))<1:
+        return render_template("add.html", balance=session["balance"])
     else:
         a = int(float(request.args.get("amount")) * 100)
         session["add"] = a

@@ -1,6 +1,6 @@
 body
 {
-    background-color: #7DBFA4;
+    background-color: whitesmoke;
     font-family: "Georgia", Times, serif;
 }
 
@@ -36,10 +36,10 @@ main img
 
 .formbox{
   align-self: center;
-  text-align: left;
+  text-align: center;
   background-color: lightgrey;
   border-style: solid;
   border-color: #303944;
-  border-width: 10px;
+  border-width: 5px;
   padding: 50px;
 }

@@ -7,7 +7,9 @@
 {% block main %}
     <div class="formbox">
       <h3>Add money to your account here:</h3>
+      <br>
       <form action="/payment" method="GET">
+
         <div class="form-group">
             <input autocomplete="off" autofocus class="form-control" name="amount" placeholder="Amount (in $)" type="number" min="1">
         </div>
