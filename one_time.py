@@ -1,4 +1,5 @@
 import sqlite3
+import time
 
 database = sqlite3.connect('munus.db', isolation_level = None)
 db = database.cursor()
@@ -6,10 +7,10 @@ db = database.cursor()
 a = input('what function do you want to do?')
 
 if a == 'create':
-    db.execute('CREATE TABLE history(user_id INTEGER, type TEXT, product_id INTEGER, amount INTEGER, timestamp TIME);')
+    db.execute('CREATE TABLE orders(user_id INTEGER, product_id INTEGER, wtp INTEGER, expir TIME);')
 
 if a == 'test':
-    print(len(db.execute('SELECT * FROM products').fetchall()))
+    print(len(db.execute('SELECT * FROM orders').fetchall()))
 
 if a == 'unique':
     db.execute("DROP TABLE history")
@@ -34,9 +35,9 @@ if a in ['&pizza', 'saloniki','swissbakers','animezakka','crimsoncorner']:
         b = f.readline()
 
 if a == 'a':
-    print(db.execute("ALTER TABLE history ADD timestamp TIME;"))
+    print(db.execute("ALTER TABLE products ADD id INTEGER;"))
 
-'''if a == 'x':
+if a == 'x':
     for j in range(19988):
         statement1 = "SELECT name FROM products ORDER BY name LIMIT 1 OFFSET {0};".format(j)
         try:
@@ -47,7 +48,7 @@ if a == 'a':
                 statement = "UPDATE products SET id = {0} WHERE name = '{1}';".format(j, db.execute(statement1).fetchone()[0])
                 db.execute(statement)
             except Exception as e:
-                print('error')
-                sleep(4)
+                print('error',e)
+                time.sleep(4)
         if j%1000 == 0:
-            print(j)'''
+            print(j)

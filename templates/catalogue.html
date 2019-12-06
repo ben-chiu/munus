@@ -23,14 +23,15 @@
     <h3>{{ store }}</h3>
     <table class = "table table-striped">
     {% if prod %}
+      <p1> Click on an item to order it</p1>
       <tr>
-        <th>Product</th>
-        <th>Price</th>
+        <th class = "align">Product</th>
+        <th class = "align">Price</th>
       </tr>
     {% endif %}
     {% for i in range(names|length) %}
         <tr>
-          <td class = "align">{{names[i]}}</td>
+          <td class = "align"><a href={{ product_ids[i] }}>{{names[i]}}</a></td>
           <td class = "align">{{prices[i]}}</td>
     {% endfor %}
     </table>
