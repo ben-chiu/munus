@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Pickup
+{% endblock %}
+
+{% block main %}
+<h2>Pickup</h2><br>
+<h4>Current Orders</h4>
+<table class = "table table-striped">
+  <tr>
+    <th>Store</th>
+    <th>Product</th>
+    <th>Price</th>
+    <th>Delivery Payment</th>
+    <th>Expiring Soon?</th>
+  </tr>
+  {% for i in range(names|length) %}
+      <tr>
+        <td class = "align">{{infoList[i][0]}}</td>
+        <td class = "align">{{infoList[i][1]}}</td>
+        <td class = "align">{{infoList[i][2]}}</td>
+        <td class = "align">{{infoList[i][3]}}</td>
+        {% if infoList[i][4]%}
+        {% endif %}
+      </tr>
+  {% endfor %}
+</table>
+{% endblock %}
