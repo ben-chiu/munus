@@ -9,13 +9,17 @@
     <p>
         Browse our products by store!
     </p>
-    <form action="/catlaogue" method="POST">
+    <form action="/catalogue" method="POST">
         <div class="form-group">
-          <select name="store">
+          <select name="store" onchange="this.form.submit()">
             {% for store in stores %}
             <option value="{{store}}">{{store}}</option>
             {% endfor %}
           </select>
         </div>
     </form>
+    <br><br>
+    {% for product in products %}
+      <p>{{product}}</p>
+    {% endfor %}
 {% endblock %}

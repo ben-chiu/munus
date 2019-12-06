@@ -256,9 +256,21 @@ def change():
 @login_required
 def catalogue():
     if request.method == "GET":
-        stores = db.execute("SELECT DISTINCT store FROM products")
-        render_template("catalogue.html")
-        '''add more'''
+        statement = "SELECT DISTINCT store FROM products"
+        storelist = db.execute(statement).fetchall()
+        stores = []
+        for element in storelist:
+            stores.append(element[0])
+        return render_template("catalogue.html", stores=stores, balance=session["balance"])
+    else:
+        store = request.form.get("store")
+        print(store)
+        statement = "SELECT name FROM products WHERE store={0}".format(store)
+        productlist = db.execute(statement).fetchall()
+        products =[]
+        for element in productlist:
+            products.append(element[0])
+        render_template("catalogue.html", products=products, balance=session["balance"])
 
 
 def errorhandler(e):
