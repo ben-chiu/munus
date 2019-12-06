@@ -12,7 +12,7 @@
     <form action="/catalogue" method="POST">
         <div class="form-group">
           <select name="store" onchange="this.form.submit()">
-            <option value="" disabled>--</option>
+            <option value="" hidden>--</option>
             {% for store in stores %}
               <option value="{{store}}">{{store}}</option>
             {% endfor %}

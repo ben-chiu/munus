@@ -276,9 +276,32 @@ def catalogue():
 @app.route("/order", methods = ["GET", "POST"])
 @login_required
 def order():
-    item = request.args.get("id")
-    return render_template("order.html", item = item)
+    print(request.method)
+    if request.method == "GET":
+        print('bitch')
+        statement = "SELECT * FROM products WHERE id = {0};".format(request.args.get("id"))
+        item = db.execute(statement).fetchone()
+        url = '/order?id='+str(item[3])
+        return render_template("order.html", item = item, url = url, nOrd = True)
+    elif request.method == "POST":
+        expir = request.form.get("datefield")
+        wtp = request.form.get("wtp")
 
+        statement = "SELECT * FROM products WHERE id = {0};".format(request.args.get("id"))
+        item = db.execute(statement).fetchone()
+        print(item)
+
+        statement = "INSERT INTO orders (user_id, product_id, wtp, expir) VALUES ({0}, {1}, {2}, '{3}');".format(session['user_id'], item[3], wtp, expir)
+        db.execute(statement)
+
+
+        statementAmt = "SELECT money FROM users WHERE id = {0}".format(session['user_id'])
+        amt = db.execute(statementAmt).fetchone()[0]
+        statement = "UPDATE users SET money = money - {0} WHERE id = {1}".format(amt, session['user_id'])
+        db.execute(statement)
+        # this doesn't work yet 
+
+        return render_template("ordered.html", item = item)
 
 
 

@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Success
+{% endblock %}
+
+{% block main %}
+    <h2>You successfully made an order for {{ item[1] }} from {{ item[0] }}!</h2>
+    <h4>We'll let you know if someone fulfills your order</h4>
+{% endblock %}

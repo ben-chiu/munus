@@ -4,6 +4,27 @@
     Change Password
 {% endblock %}
 
+<script>
+  datePickerId.max = new Date().toISOString().split("T")[0];
+</script>
+
+
 {% block main %}
-    <h1>{{ item }}</h1>
+    {% if nOrd %}
+      <div class ="formbox">
+        <h1 class = "darkgreen">{{ item[1] }}</h1>
+        <h3> Price: ${{ item[2] }}</h3><br><br>
+        <div class="form-group">
+          <form action = {{ url }} method="POST">
+            <label for="wtp">How much are you willing to pay to get this delivered to your door?</label><br>
+            <input autocomplete="off" autofocus class="form-control" name="wtp" id ="wtp" placeholder="Amount ($)" type="number" min = "0"><br><br>
+            <label for="datePickerId">When should this order automatically expire?</label><br>
+            <input autocomplete="off" autofocus class="form-control" name="datefield" id ="datePickerId" placeholder="Time" type="date"><br><br><br>
+            <button class="btn btn-primary" type="submit">Submit</button>
+          </form>
+        </div>
+      </div>
+    {% else %}
+      <p1> {{ item }} </p1>
+    {% endif %}
 {% endblock %}

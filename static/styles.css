@@ -43,6 +43,20 @@ main img
   padding: 50px;
 }
 
+.formbox2{
+  text-align: left;
+  margin: auto;
+  background-color: lightgrey;
+  border-style: solid;
+  border-color: #303944;
+  border-width: 5px;
+  padding: 50px;
+}
+
 .align{
   text-align: left;
+}
+
+.darkgreen{
+  color: darkgreen;
 }
