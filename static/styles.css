@@ -35,11 +35,14 @@ main img
 }
 
 .formbox{
-  align-self: center;
-  text-align: center;
+  margin: auto;
   background-color: lightgrey;
   border-style: solid;
   border-color: #303944;
   border-width: 5px;
   padding: 50px;
+}
+
+.align{
+  text-align: left;
 }

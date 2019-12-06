@@ -12,14 +12,26 @@
     <form action="/catalogue" method="POST">
         <div class="form-group">
           <select name="store" onchange="this.form.submit()">
+            <option value="" disabled>--</option>
             {% for store in stores %}
-            <option value="{{store}}">{{store}}</option>
+              <option value="{{store}}">{{store}}</option>
             {% endfor %}
           </select>
         </div>
     </form>
     <br><br>
-    {% for product in products %}
-      <p>{{product}}</p>
+    <h3>{{ store }}</h3>
+    <table class = "table table-striped">
+    {% if prod %}
+      <tr>
+        <th>Product</th>
+        <th>Price</th>
+      </tr>
+    {% endif %}
+    {% for i in range(names|length) %}
+        <tr>
+          <td class = "align">{{names[i]}}</td>
+          <td class = "align">{{prices[i]}}</td>
     {% endfor %}
+    </table>
 {% endblock %}
