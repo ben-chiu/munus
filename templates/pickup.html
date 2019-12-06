@@ -11,15 +11,19 @@
   <tr>
     <th>Store</th>
     <th>Product</th>
-    <th>Timeframe</th>
-    <th>Delivery Bonus</th>
-{% for i in range(names|length) %}
-    <tr>
-      <td class = "align">{{stores[i]}}</td>
-      <td class = "align">{{products[i]}}</td>
-      <td class = "align">{{timeframes[i]}}<td>
-      <td class = "align">{{delivery bonus[i]}}<td>
-    <tr>
-{% endfor %}
+    <th>Price</th>
+    <th>Delivery Payment</th>
+    <th>Expiring Soon?</th>
+  </tr>
+  {% for i in range(names|length) %}
+      <tr>
+        <td class = "align">{{infoList[i][0]}}</td>
+        <td class = "align">{{infoList[i][1]}}</td>
+        <td class = "align">{{infoList[i][2]}}</td>
+        <td class = "align">{{infoList[i][3]}}</td>
+        {% if infoList[i][4]%}
+        {% endif %}
+      </tr>
+  {% endfor %}
 </table>
 {% endblock %}

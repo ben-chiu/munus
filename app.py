@@ -10,7 +10,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 from helpers import apology, login_required, usd
 from flask import send_from_directory
-from datetime import datetime
+import datetime
 
 
 # Configure application
@@ -282,19 +282,19 @@ def pickup():
     if request.method == "GET":
         statement = "SELECT store, name, price, wtp, expir FROM orders JOIN products ON product_id=id"
         infoList = db.execute(statement).fetchall()
-        print(infoList)
-        return render_template("pickup.html", balance=session["balance"])
-    else:
-        statement = "SELECT DISTINCT store FROM products"
-        storelist = db.execute(statement).fetchall()
-        stores = [i[0] for i in storelist]
 
-        store = request.form.get("store")
-        statement = "SELECT name, price FROM products WHERE store='{0}';".format(store)
-        productlist = db.execute(statement).fetchall()
-        names =[j[0] for j in productlist]
-        prices = [j[1] for j in productlist]
-        return render_template("catalogue.html", stores = stores, store = store, names=names, prod = True, prices = prices, balance=session["balance"])
+        # check to see if expiring Soon
+        current = datetime.datetime.now()
+        for i in infoList:
+            expirInfo = map(int, infoList[i][4].split('-'))
+            if (current.month == expirInfo[1]):
+                if (expirInfo[2] - current.day < 3):
+                    infoList[i][4] = True
+            elif (expirInfo[2] - current.day > 28):
+                infoList[i][4] = True
+            else:
+                infoList[i][4] = False
+        return render_template("pickup.html", infoList=infoList, balance=session["balance"])
 
 def errorhandler(e):
     """Handle error"""
