@@ -12,9 +12,10 @@
               <tr>
                   <th>Product</th>
                   <th>Store</th>
+                  <th>Quantity</th>
                   <th>Amount</th>
                   <th>Expiration Date</th>
-                  <th>Cancel?<th>
+                  <th>Cancel?</th>
               </tr>
           </thead>
           <tbody>
@@ -22,7 +23,8 @@
                   <tr>
                       <td>{{row[1]}}</td>
                       <td>{{row[2]}}</td>
-                      <td>{{row[3] + row[4]}}</td>
+                      <td>{{row[6]}}</td>
+                      <td>${{row[3] + row[6] * row[4]}}</td>
                       <td>{{row[5]}}</td>
                       <td><a href="/userorders?cancelId={{row[0]}}">Cancel</a></td>
                   </tr>

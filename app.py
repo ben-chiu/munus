@@ -361,22 +361,27 @@ def order():
     elif request.method == "POST":
         expir = request.form.get("datefield")
         wtp = request.form.get("wtp")
+        quantity = int(request.form.get("quantity"))
 
         statement = "SELECT * FROM products WHERE id = {0};".format(request.args.get("id"))
         item = db.execute(statement).fetchone()
 
-        if (float(wtp.replace(',','')) + float(item[2])) > (float(session["balance"].strip("$").replace(',',''))):
+        print(float(wtp.replace(',','')))
+        print(float(item[2]))
+        print(type(quantity))
+        if (float(wtp.replace(',','')) + float(item[2])*quantity) > (float(session["balance"].strip("$").replace(',',''))):
             flash("Insufficient funds. Please add money.")
             return render_template("add.html", balance=session["balance"])
 
-        statement = "INSERT INTO orders (user_id, product_id, wtp, expir) VALUES ({0}, {1}, {2}, '{3}');".format(session['user_id'], item[3], wtp, expir)
+        statement = "INSERT INTO orders (user_id, product_id, wtp, expir, quantity) VALUES ({0}, {1}, {2}, '{3}', '{4}');".format(session['user_id'], item[3], wtp, expir, quantity)
         db.execute(statement)
 
         statementAmt = "SELECT money FROM users WHERE id = {0}".format(session['user_id'])
-        amt = db.execute(statementAmt).fetchone()[0]
-        print(amt)
-        statement = "UPDATE users SET money = money - {0} WHERE id = {1}".format(float(wtp.replace(',','')) + float(item[2]), session['user_id'])
+        amt = db.execute(statementAmt).fetchone()[0] * quantity
+
+        statement = "UPDATE users SET money = money - {0} WHERE id = {1}".format((float(wtp.replace(',','')) + float(item[2]))*quantity, session['user_id'])
         db.execute(statement)
+
         # this does work
         session["balance"] = usd(amt - float(wtp.replace(',','')) - float(item[2]))
 
@@ -387,7 +392,7 @@ def order():
 @login_required
 def pickup():
     if request.method == "GET":
-        statement = "SELECT store, name, price, wtp, building, room, expir FROM orders JOIN products ON product_id=products.id JOIN users ON orders.user_id=users.id"
+        statement = "SELECT store, name, price, wtp, building, room, expir, quantity FROM orders JOIN products ON product_id=products.id JOIN users ON orders.user_id=users.id"
         infoList = db.execute(statement).fetchall()
         current = date.today()
         expSoon = []
@@ -405,9 +410,9 @@ def pickup():
 def userorders():
     if (request.args.get("cancelId")):
         #find value of order refund
-        statement = "SELECT price, wtp FROM orders JOIN products ON product_id=products.id WHERE orders.id='{0}'".format(request.args.get("cancelId"))
+        statement = "SELECT price, quantity, wtp FROM orders JOIN products ON product_id=products.id WHERE orders.id='{0}'".format(request.args.get("cancelId"))
         vals = db.execute(statement).fetchone()
-        refund = vals[0] + vals[1]
+        refund = vals[0]*vals[1] + vals[2]
 
         #delete order
         statement = "DELETE FROM orders WHERE id='{0}';".format(request.args.get("cancelId"))
@@ -418,7 +423,7 @@ def userorders():
         newBalance = balance + refund;
         statement = "UPDATE users SET money='{0}' WHERE id='{1}';".format(newBalance, session["user_id"])
         session["balance"] = usd(newBalance)
-    statement = "SELECT orders.id, name, store, wtp, price, expir FROM orders JOIN products ON product_id=products.id WHERE user_id='{0}'".format(session["user_id"])
+    statement = "SELECT orders.id, name, store, wtp, price, expir, quantity FROM orders JOIN products ON product_id=products.id WHERE user_id='{0}'".format(session["user_id"])
     rows = db.execute(statement).fetchall()
     return render_template("userorders.html", rows=rows, balance=session["balance"])
 
@@ -445,5 +450,5 @@ def errorhandler(e):
 for code in default_exceptions:
     app.errorhandler(code)(errorhandler)
 
-# db.close()
-# database.close()
+#db.close()
+#database.close()
