@@ -5,6 +5,7 @@ import sqlite3
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
 from flask_session import Session
 from tempfile import mkdtemp
+from operator import itemgetter
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import date, datetime
@@ -354,32 +355,22 @@ def catalogue():
 @login_required
 def suggested():
     #get list of all productIDs from history
-    statement = "SELECT product_id FROM orders"
-    productidsraw = db.execute(statement).fetchall()
-
-    productidssorted = {}
-    for productID in productidsraw:
-        #for each one, put it into a dictionary that counts number of times its in history
-        #if already in dicitonary, add one to value, if not, make new key and set value to 1
-        if productID in productidssorted:
-            productidssorted[productID] += 1
-        else:
-            productidssorted[productID] = 1
-    sorted(productidssorted.items(), key = lambda kv:(kv[1], kv[0])) #sorts dict by value
+    statement = "SELECT product_id, COUNT(*) FROM history GROUP BY product_id"
+    instances = db.execute(statement).fetchall()
+    instances.sort(key=itemgetter(1), reverse=True)
+    print(instances)
 
     #add in corresponding names for sorted product ID list
     names = []
     product_ids = []
-    for productID in productidssorted:
-        statement = "SELECT name, product_id FROM produts WHERE product_id={0}".format(productID)
-        item = db.execute(statement).fetchone()
-        names.append(item[0])
-        names = [name.replace('\\\'','').replace('\\\"','') for name in names] # strips the backslashes from the names of the products
-        product_ids.append('/order?id='+str(item[1]))
-    print(productidsraw)
-    print(productidssorted)
-    print(product_ids)
-    print(names)
+    if len(instances) != 0:
+        for product in instances:
+            if product[0] != -1:
+                statement = "SELECT name FROM products WHERE id={0}".format(product[0])
+                item = db.execute(statement).fetchone()
+                names.append(item[0])
+                names = [name.replace('\\\'','').replace('\\\"','') for name in names] # strips the backslashes from the names of the products
+                product_ids.append('/order?id='+str(product[0]))
     return render_template("suggested.html", product_ids=product_ids, names=names, balance=session["balance"])
 
 @app.route("/order", methods = ["GET", "POST"])
