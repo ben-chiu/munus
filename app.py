@@ -1,5 +1,7 @@
+from __future__ import print_function
 import os
 import stripe
+
 
 import sqlite3
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
@@ -34,8 +36,6 @@ def compareDays(d1, d2):
         if d1[i] < d2[i]:
             return(True)
     return(False)
-
-
 
 
 
@@ -90,11 +90,10 @@ if lastDay[:-2] != currDay:
         db.execute(statement)
 
 # write into the file the current day
+
+
 f = open('day.txt', 'w')
-try:
-    print(f, currDay)
-except Exception, e:
-    execute('print(currDay, file = f)')
+print(currDay, file=f)
 f.close()
 
 # the homepage
