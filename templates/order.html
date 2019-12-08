@@ -16,11 +16,29 @@
         <h3> Price: ${{ item[2] }}</h3><br><br>
         <div class="form-group">
           <form action = {{ url }} method="POST">
+            <label for="quantity">How many do you want?</label><br>
+            <p id="myText">InnerHTML</p>
+            <script>
+              myMethod(){
+                var x = document.getElementById("")
+              }
+            </script>
+            <input autocomplete="off" autofocus class="form-control" name="quantity" id ="quantity" placeholder="Quantity" type="number" min = "1" onkeyup="getTotal(this)">
+            <script>
+              getTotal(element){
+                var price = 3;
+                var quant = 2;
+                var tot = price * quant;
+                <h2>METHOD RUN</h2>
+                var x = document.getElementById("total").innerhtml("tot");
+              }
+            </script><br><br>
             <label for="wtp">How much are you willing to pay to get this delivered to your door?</label><br>
             <input autocomplete="off" autofocus class="form-control" name="wtp" id ="wtp" placeholder="Amount ($)" type="number" min = "0"><br><br>
             <label for="datePickerId">When should this order automatically expire?</label><br>
-            <input autocomplete="off" autofocus class="form-control" name="datefield" id ="datePickerId" placeholder="Time" type="date" min="{{date}}"><br><br><br>
-            <button class="btn btn-primary" type="submit">Submit</button>
+            <input autocomplete="off" autofocus class="form-control" name="datefield" id ="datePickerId" placeholder="Time" type="date" min="{{date}}"><br><br>
+            <h4 id="total">Total: {{item[2]}}</h4><br><br>
+            <button class="btn btn-primary" type="submit">Place Order</button>
           </form>
         </div>
       </div>

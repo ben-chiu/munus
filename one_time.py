@@ -55,3 +55,6 @@ if a == 'x':
 
 if a == "clear":
     db.execute("DROP TABLE orders")
+
+if a == "alter":
+    db.execute("ALTER TABLE orders ADD quantity INTEGER NOT NULL DEFAULT 1")

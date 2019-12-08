@@ -12,7 +12,8 @@
       <tr>
         <th>Store</th>
         <th>Product</th>
-        <th>Price</th>
+        <th>Quantity</th>
+        <th>Total</th>
         <th>Delivery Payment</th>
         <th>Location</th>
         <th>Expiring Soon?</th>
@@ -21,9 +22,10 @@
           <tr>
             <td class = "align">{{infoList[i][0]}}</td>
             <td class = "align">{{infoList[i][1]}}</td>
-            <td class = "align">${{infoList[i][2]}}</td>
+            <td class = "align">{{infoList[i][7]}}</td>
+            <td class = "align">${{infoList[i][2] * infoList[i][7]}}</td>
             <td class = "align">${{infoList[i][3]}}</td>
-            <td class = "align">{{infoList[i][4]}} {{infoList[i][5]}}<td>
+            <td class = "align">{{infoList[i][4]}} {{infoList[i][5]}}</td>
             <td class = "align">{{expSoon[i]}}</td>
           </tr>
       {% endfor %}
