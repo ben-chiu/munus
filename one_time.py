@@ -57,12 +57,15 @@ if a == 'x':
 if a == "clear":
     db.execute("DROP TABLE orders")
 
-<<<<<<< HEAD
+
 if a == "alter":
     db.execute("ALTER TABLE orders ADD quantity INTEGER NOT NULL DEFAULT 1")
-=======
+
 if a =='day':
     f = open('day.txt', 'w')
     print(date.today(), file = f)
     f.close()
->>>>>>> 4839f5d865f00dce6bfc94b5c2ae70a1b245a699
+
+if a =='5am':
+    print(db.execute('SELECT orders.id FROM orders').fetchall())
+    print(db.execute('SELECT orders.id FROM orders JOIN products ON product_id = products.id;').fetchall())

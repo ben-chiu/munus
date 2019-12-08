@@ -391,19 +391,53 @@ def order():
 @app.route("/pickup", methods=["GET", "POST"])
 @login_required
 def pickup():
-    if request.method == "GET":
-        statement = "SELECT store, name, price, wtp, building, room, expir, quantity FROM orders JOIN products ON product_id=products.id JOIN users ON orders.user_id=users.id"
-        infoList = db.execute(statement).fetchall()
-        current = date.today()
-        expSoon = []
-        for i in infoList:
-            expirInfo = list(map(int, i[6].split('-')))
-            exp = date(expirInfo[0], expirInfo[1], expirInfo[2])
-            if (exp - current).days < 2:
-                expSoon.append("Yes")
-            else:
-                expSoon.append("No")
-        return render_template("pickup.html", infoList=infoList, expSoon=expSoon, balance=session["balance"])
+    if (request.args.get("pickedupID")):
+        #find value of order refund
+        statement = "SELECT price, quantity, wtp, product_id FROM orders JOIN products ON product_id=products.id WHERE orders.id={0};".format(request.args.get("pickedupID"))
+        vals = db.execute(statement).fetchone()
+        print(vals)
+        refund = vals[0]*vals[1] + vals[2]
+
+        # add to balance
+        balance = float(session['balance'].strip('$').replace(',',''))
+        nB = balance + refund
+        statement = "UPDATE USERS set money = {0} WHERE id = '{1}';".format(nB, session['user_id'])
+        session['balance'] = usd(nB)
+
+        # add to orderer history
+        statement = "SELECT user_id FROM orders WHERE id = {0};".format(request.args.get('pickedupID'))
+        user = db.execute(statement).fetchone()[0]
+        statement = "INSERT INTO history (user_id, type, product_id, amount) VALUES ({0}, 'ORDER', {1}, {2});".format(user, vals[3], -refund)
+        db.execute(statement)
+        # add to pickup history
+        statement = "INSERT INTO history (user_id, type, product_id, amount) VALUES ({0}, 'PICKUP', {1}, {2})".format(session['user_id'], vals[3], refund)
+
+
+        #delete order
+        statement = "DELETE FROM orders WHERE id='{0}';".format(request.args.get("pickedupID"))
+        db.execute(statement)
+
+    statement = "SELECT store, name, price, wtp, building, room, expir, quantity, orders.id FROM orders JOIN products ON product_id=products.id JOIN users ON orders.user_id=users.id"
+    infoList = db.execute(statement).fetchall()
+    current = date.today()
+    expSoon = []
+    for i in infoList:
+        expirInfo = list(map(int, i[6].split('-')))
+        exp = date(expirInfo[0], expirInfo[1], expirInfo[2])
+        if (exp - current).days < 2:
+            expSoon.append("Yes")
+        else:
+            expSoon.append("No")
+
+    urls = []
+    for i in range(len(infoList)):
+        urls.append('/pickup?pickedupID=' + str(infoList[i][8]))
+
+    return render_template("pickup.html", infoList=infoList, urls = urls, expSoon=expSoon, balance=session["balance"])
+
+
+
+
 
 @app.route("/userorders")
 @login_required
