@@ -442,6 +442,9 @@ def pickup():
         print(vals)
         refund = vals[0]*vals[1] + vals[2]
 
+        #flash that you picked up something
+        statement = "SELECT name FROM products WHERE id = {0}".format(request.args.get('pickedupID'))
+        flash('Picked up ' + db.execute(statement).fetchone()[0])
         # add to balance
         balance = float(session['balance'].strip('$').replace(',',''))
         nB = balance + refund
