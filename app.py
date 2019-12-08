@@ -346,6 +346,7 @@ def catalogue():
                     'animezakka': 'Anime Zakka',
                     'swissbakers': 'Swissbakers',
                     'saloniki': 'Saloniki',
+                    'dormcrew': 'Dorm Crew',
                     'any': 'Any store'}
 
     storeNames = [storeReplace.get(n,n) for n in stores]
@@ -403,7 +404,18 @@ def order():
         expir = request.form.get("datefield")
         print(expir)
         wtp = request.form.get("wtp")
-        quantity = int(request.form.get("quantity"))
+        quantity = request.form.get("quantity")
+
+        #if any of the forms are not filled out, send an error message and go back to the page
+        if not expir or not wtp or not quantity:
+
+            flash('Incomplete order!')
+            statement = "SELECT * FROM products WHERE id = {0};".format(request.args.get("id"))
+            item = db.execute(statement).fetchone()
+            url = '/order?id='+str(item[3])
+            return render_template("order.html", item = item, url = url, nOrd = True, date=date.today(), balance=session["balance"])
+
+        quantity = int(quantity)
 
         statement = "SELECT * FROM products WHERE id = {0};".format(request.args.get("id"))
         item = db.execute(statement).fetchone()
@@ -477,7 +489,7 @@ def pickup():
             label = filter + " Yard"
             statement = "SELECT store, name, price, wtp, building, room, expir, quantity, orders.id FROM orders JOIN products ON product_id=products.id JOIN users on orders.user_id=users.id WHERE users.building in {1} AND user_id != {0} ORDER BY orders.wtp DESC;".format(session['user_id'], dormToYard[filter])
             print(statement)
-        elif filter in ('CVS', 'saloniki','crimsoncorner','animezakka','swissbakers','&pizza'):
+        elif filter in ('CVS', 'saloniki','crimsoncorner','animezakka','swissbakers','&pizza', 'dormcrew'):
             label = filter
             statement = "SELECT store, name, price, wtp, building, room, expir, quantity, orders.id FROM orders JOIN products ON product_id=products.id JOIN users on orders.user_id=users.id WHERE products.store = '{1}' AND user_id != {0} ORDER BY orders.wtp DESC;".format(session['user_id'], filter)
             print(statement)

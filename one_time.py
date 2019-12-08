@@ -17,8 +17,11 @@ if a == 'unique':
     db.execute("DROP TABLE history")
 
 if a == 'display':
-    for i in range(100):print(db.execute('SELECT * FROM products').fetchall()[:10000][i])
+    for i in range(1):print(db.execute('SELECT * FROM products ORDER BY id DESC').fetchall()[:10000][i])
     #print(db.execute("SELECT * FROM products WHERE store == 'animezakka';").fetchall()[:10])
+
+if a=='dorm crew':
+    db.execute("INSERT INTO products (store, name, price, id) VALUES ('dormcrew', 'Toilet Paper', 0, 19988);")
 
 if a in ['&pizza', 'saloniki','swissbakers','animezakka','crimsoncorner']:
     f = open(a+'.txt', 'r')
