@@ -271,7 +271,7 @@ def order():
         statement = "SELECT * FROM products WHERE id = {0};".format(request.args.get("id"))
         item = db.execute(statement).fetchone()
         url = '/order?id='+str(item[3])
-        return render_template("order.html", item = item, url = url, nOrd = True, date=date.today())
+        return render_template("order.html", item = item, url = url, nOrd = True, date=date.today(), balance=session["balance"])
     elif request.method == "POST":
         expir = request.form.get("datefield")
         wtp = request.form.get("wtp")
@@ -305,7 +305,7 @@ def pickup():
         for i in infoList:
             expirInfo = map(int, i[6].split('-'))
             exp = date(expirInfo[0], expirInfo[1], expirInfo[2])
-            if (exp - current) < 2:
+            if (exp - current).days < 2:
                 expSoon.append("Yes")
             else:
                 expSoon.append("No")
@@ -315,8 +315,13 @@ def pickup():
 @login_required
 def userorders():
     if (request.args.get("cancelId")):
+        statement = "SELECT price, wtp FROM orders JOIN products ON product_id=products.id WHERE orders.id='{0}'".format(request.args.get("cancelId"))
+        vals = db.execute(statement).fetchone()
+        print(vals)
+        refund = float(vals[0]) + float(vals[1])
         statement = "DELETE FROM orders WHERE id='{0}';".format(request.args.get("cancelId"))
         db.execute(statement)
+        statement = "UPDATE users SET money='{0}' WHERE id='{1}';".format((session["balance"] + refund), session["user_id"])
     statement = "SELECT orders.id, name, store, wtp, price, expir FROM orders JOIN products ON product_id=products.id WHERE user_id='{0}'".format(session["user_id"])
     rows = db.execute(statement).fetchall()
     return render_template("userorders.html", rows=rows, balance=session["balance"])
