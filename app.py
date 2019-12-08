@@ -106,7 +106,7 @@ def index():
     instances = db.execute(statement).fetchall()
     instances.sort(key=itemgetter(1), reverse=True)
 
-    #add in corresponding names for sorted product ID list
+    #add in corresponding names for sorted product ID list to show top products
     names = []
     product_ids = []
     if len(instances) != 0:
