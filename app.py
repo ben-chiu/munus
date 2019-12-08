@@ -23,6 +23,44 @@ stripe.api_key = secret_key
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
+def compareDays(d1, d2):
+    '''function to compare days
+        inputs: two days in format yyyy-mm-dd
+        outputs True if d1 < d2, else false'''
+    d1 = list(map(int, d1.split('-')))
+    d2 = list(map(int, d2.split('-')))
+    for i in range(3):
+        if d1[i] < d2[i]:
+            return(True)
+    return(False)
+
+f = open('day.txt', 'r')
+lastDay = f.readline()
+f.close()
+currDay = date.today()
+if lastDay[:-2] != currDay:
+    orders = db.execute("SELECT expir, id FROM orders;").fetchall()
+    badOrders = []
+    for i in orders:
+        if compareDays(i[0], currDay):
+            badOrders.append(i[1])
+
+    for i in badOrders:
+        statement = "SELECT user_id, product_id, quantity, wtp FROM orders WHERE id = {0]};".format(i)
+        order = db.execute(statement).fetchone()
+        statement = "SELECT price FROM products WHERE id = {0};".format(order[1])
+        p = db.execute(statement).fetchone()[0])
+        total = p * order[2] + order[3]
+        statement = "UPDATE users SET money = money + {0} WHERE id = {1}".format(total, order[0])
+        db.execute(statement)
+
+f = open('day.txt', 'w')
+print(currDay, file = f)
+f.close()
+
+
+
+
 # Ensure responses aren't cached
 @app.after_request
 def after_request(response):
@@ -246,23 +284,46 @@ def change():
 @app.route("/catalogue", methods=["GET", "POST"])
 @login_required
 def catalogue():
+    '''
     if request.method == "GET":
         statement = "SELECT DISTINCT store FROM products"
         storelist = db.execute(statement).fetchall()
         stores = [i[0] for i in storelist]
-        return render_template("catalogue.html", stores=stores, balance=session["balance"], prod = False)
-    else:
-        statement = "SELECT DISTINCT store FROM products"
-        storelist = db.execute(statement).fetchall()
-        stores = [i[0] for i in storelist]
+        storeReplace = {'crimsoncorner': 'Crimson Corner',
+                        'animezakka': 'Anime Zakka',
+                        'swissbakers': 'Swissbakers',
+                        'saloniki': 'Saloniki',
+                        'any': 'Any store'}
 
-        store = request.form.get("store")
+        storeNames = [storeReplace.get(n,n) for n in stores]
+
+        return render_template("catalogue.html", stores=stores, balance=session["balance"], prod = False, storeReplace = storeReplace)
+    else:'''
+    statement = "SELECT DISTINCT store FROM products"
+    storelist = db.execute(statement).fetchall()
+    stores = [i[0] for i in storelist]
+    storeReplace = {'crimsoncorner': 'Crimson Corner',
+                    'animezakka': 'Anime Zakka',
+                    'swissbakers': 'Swissbakers',
+                    'saloniki': 'Saloniki',
+                    'any': 'Any store'}
+
+    storeNames = [storeReplace.get(n,n) for n in stores]
+
+    store = request.form.get("store") # can also be "any"
+
+    if not store:store = 'any'
+
+    if store == "any" :
+        statement = "SELECT name, price, id FROM products"
+        productlist = db.execute(statement).fetchall()
+    else:
         statement = "SELECT name, price, id FROM products WHERE store='{0}';".format(store)
         productlist = db.execute(statement).fetchall()
-        names =[j[0] for j in productlist]
-        prices = [j[1] for j in productlist]
-        product_ids = ['/order?id='+str(j[2]) for j in productlist]
-        return render_template("catalogue.html", stores = stores, product_ids = product_ids, store = store, names=names, prod = True, prices = prices, balance=session["balance"])
+    names =[j[0].replace('\\\'','').replace('\\\"','') for j in productlist]
+    prices = [j[1] for j in productlist]
+    product_ids = ['/order?id='+str(j[2]) for j in productlist]
+    return render_template("catalogue.html", stores = stores, product_ids = product_ids, store = store, names=names, prod = True, prices = prices, balance=session["balance"], storeReplace = storeReplace)
 
 @app.route("/order", methods = ["GET", "POST"])
 @login_required
@@ -306,7 +367,7 @@ def pickup():
         current = date.today()
         expSoon = []
         for i in infoList:
-            expirInfo = map(int, i[6].split('-'))
+            expirInfo = list(map(int, i[6].split('-')))
             exp = date(expirInfo[0], expirInfo[1], expirInfo[2])
             if (exp - current).days < 2:
                 expSoon.append("Yes")

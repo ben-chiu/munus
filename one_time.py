@@ -1,5 +1,6 @@
 import sqlite3
 import time
+from datetime import date
 
 database = sqlite3.connect('munus.db', isolation_level = None)
 db = database.cursor()
@@ -55,3 +56,8 @@ if a == 'x':
 
 if a == "clear":
     db.execute("DROP TABLE orders")
+
+if a =='day':
+    f = open('day.txt', 'w')
+    print(date.today(), file = f)
+    f.close()
