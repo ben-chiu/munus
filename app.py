@@ -88,9 +88,9 @@ if lastDay[:-2] != currDay:
         db.execute(statement)
 
 # write into the file the current day
-f = open('day.txt', 'w')
-print(currDay, file = f)
-f.close()
+#f = open('day.txt', 'w')
+#print(currDay, file = f)
+#f.close()
 
 # the homepage
 @app.route("/")
