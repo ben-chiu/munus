@@ -318,13 +318,20 @@ def pickup():
 @login_required
 def userorders():
     if (request.args.get("cancelId")):
+        #find value of order refund
         statement = "SELECT price, wtp FROM orders JOIN products ON product_id=products.id WHERE orders.id='{0}'".format(request.args.get("cancelId"))
         vals = db.execute(statement).fetchone()
-        print(vals)
-        refund = float(vals[0]) + float(vals[1])
+        refund = vals[0] + vals[1]
+
+        #delete order
         statement = "DELETE FROM orders WHERE id='{0}';".format(request.args.get("cancelId"))
         db.execute(statement)
-        statement = "UPDATE users SET money='{0}' WHERE id='{1}';".format((session["balance"] + refund), session["user_id"])
+
+        #add refund back to balance
+        balance = float(session["balance"].strip("$").replace(',',''))
+        newBalance = balance + refund;
+        statement = "UPDATE users SET money='{0}' WHERE id='{1}';".format(newBalance, session["user_id"])
+        session["balance"] = usd(newBalance)
     statement = "SELECT orders.id, name, store, wtp, price, expir FROM orders JOIN products ON product_id=products.id WHERE user_id='{0}'".format(session["user_id"])
     rows = db.execute(statement).fetchall()
     return render_template("userorders.html", rows=rows, balance=session["balance"])
