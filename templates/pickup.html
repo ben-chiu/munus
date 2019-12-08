@@ -19,29 +19,34 @@
   <h4>Current Orders</h4>
   <br>
 
+  <div class="dropdown show" style="display:inline-block">
+    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Yard
+    </a>
 
-  <p1>Yard: </p1>
-  <form name = "filter" style="display:inline-block;">
-    <select name = "menu" onchange = "window.document.location.href=this.options[this.selectedIndex].value;" value="GO">
-      <option value = "" hidden>None</option>
-      <option value = "/pickup?filter=Ivy">Ivy</option>
-      <option value = "/pickup?filter=Crimson">Crimson</option>
-      <option value = "/pickup?filter=Elm">Elm</option>
-      <option value = "/pickup?filter=Oak">Oak</option>
-    </select>
-  </form>
-  <p1> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Store: </p1>
-  <form name = "filter" style = "display:inline-block">
-    <select name = "menu" onchange = "window.document.location.href=this.options[this.selectedIndex].value;" value="GO">
-      <option value = "" hidden>None</option>
-      <option value = "/pickup?filter=CVS">CVS</option>
-      <option value = "/pickup?filter=crimsoncorner">Crimson Corner</option>
-      <option value = "/pickup?filter=animezakka">Anime Zakka</option>
-      <option value = "/pickup?filter=&pizza">&pizza</option>
-      <option value = "/pickup?filter=saloniki">Saloniki</option>
-      <option value = "/pickup?filter=swissbakers">Swissbakers</option>
-    </select>
-  </form>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+      <a class="dropdown-item" href="/pickup?filter=Ivy">Ivy Yard</a>
+      <a class="dropdown-item" href="/pickup?filter=Crimson">Crimson Yard</a>
+      <a class="dropdown-item" href="/pickup?filter=Elm">Elm Yard</a>
+      <a class="dropdown-item" href="/pickup?filter=Oak">Oak Yard</a>
+    </div>
+  </div>
+
+  <div class="dropdown show" style="display:inline-block">
+    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Store
+    </a>
+
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+      <a class="dropdown-item" href="/pickup?filter=CVS">CVS</a>
+      <a class="dropdown-item" href="/pickup?filter=crimsoncorner">Crimson Corner</a>
+      <a class="dropdown-item" href="/pickup?filter=saloniki">Saloniki</a>
+      <a class="dropdown-item" href="/pickup?filter=&pizza">&pizza</a>
+      <a class="dropdown-item" href="/pickup?filter=swissbakers">Swissbakers</a>
+      <a class="dropdown-item" href="/pickup?filter=animezakka">Anime Zakka</a>
+    </div>
+  </div>
+
 
 
 

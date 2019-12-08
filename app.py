@@ -452,7 +452,7 @@ def pickup():
         statement = "DELETE FROM orders WHERE id='{0}';".format(request.args.get("pickedupID"))
         db.execute(statement)
 
-    statement = "SELECT store, name, price, wtp, building, room, expir, quantity, orders.id FROM orders JOIN products ON product_id=products.id JOIN users ON orders.user_id=users.id WHERE user_id != {0}".format(session['user_id'])
+    statement = "SELECT store, name, price, wtp, building, room, expir, quantity, orders.id FROM orders JOIN products ON product_id=products.id JOIN users ON orders.user_id=users.id WHERE user_id != {0} ORDER BY orders.wtp DESC".format(session['user_id'])
     label = ''
     if request.args.get('filter'):
         filter = request.args.get('filter')
@@ -464,11 +464,11 @@ def pickup():
                            'Oak': ('Canaday', 'Thayer')}
             yard = dormToYard[filter]
             label = filter + " Yard"
-            statement = "SELECT store, name, price, wtp, building, room, expir, quantity, orders.id FROM orders JOIN products ON product_id=products.id JOIN users on orders.user_id=users.id WHERE users.building in {1} AND user_id != {0};".format(session['user_id'], dormToYard[filter])
+            statement = "SELECT store, name, price, wtp, building, room, expir, quantity, orders.id FROM orders JOIN products ON product_id=products.id JOIN users on orders.user_id=users.id WHERE users.building in {1} AND user_id != {0} ORDER BY orders.wtp DESC;".format(session['user_id'], dormToYard[filter])
             print(statement)
         elif filter in ('CVS', 'saloniki','crimsoncorner','animezakka','swissbakers','&pizza'):
             label = filter
-            statement = "SELECT store, name, price, wtp, building, room, expir, quantity, orders.id FROM orders JOIN products ON product_id=products.id JOIN users on orders.user_id=users.id WHERE products.store = '{1}' AND user_id != {0};".format(session['user_id'], filter)
+            statement = "SELECT store, name, price, wtp, building, room, expir, quantity, orders.id FROM orders JOIN products ON product_id=products.id JOIN users on orders.user_id=users.id WHERE products.store = '{1}' AND user_id != {0} ORDER BY orders.wtp DESC;".format(session['user_id'], filter)
             print(statement)
 
     infoList = db.execute(statement).fetchall()
