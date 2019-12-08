@@ -427,18 +427,27 @@ def userorders():
     rows = db.execute(statement).fetchall()
     return render_template("userorders.html", rows=rows, balance=session["balance"])
 
-@app.route('/payout')
+@app.route('/payout', methods = ['GET', 'POST'])
 @login_required
 def payout():
+    if request.method == "GET":
+        return render_template('payout.html', balance = session['balance'])
+    else:
+        response = stripe.OAuth.token(
+            grant_type='authorization_code',
+            code='ac_123456789',
+        )
 
-    payment_intent = stripe.PaymentIntent.create(
-      payment_method_types: ['card'],
-      amount=1000,
-      currency='usd',
-      transfer_data={
-        'destination': '{{CONNECTED_STRIPE_ACCOUNT_ID}}',
-      }
-    )
+        # Access the connected account id in the response
+        connected_account_id = response.stripe_user_id
+
+        payment_intent = stripe.PaymentIntent.create(
+            payment_method_types = ['card'],
+            amount=1000,
+            currency='usd',
+            transfer_data={'destination': '{{CONNECTED_STRIPE_ACCOUNT_ID}}',}
+        )
+        return render_template('/')
 
 def errorhandler(e):
     """Handle error"""
