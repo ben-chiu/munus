@@ -7,10 +7,9 @@ from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
-from datetime import datetime
+from datetime import date, datetime
 from helpers import apology, login_required, usd
 from flask import send_from_directory
-import datetime
 
 
 # Configure application
@@ -55,8 +54,6 @@ def index():
 def history():
     statement = "SELECT type, product_id, amount, timestamp FROM history WHERE user_id={0}".format(session["user_id"])
     rows = db.execute(statement).fetchall()
-    print("****************")
-    print(rows)
 
     returns = []
     for row in rows:
@@ -73,7 +70,6 @@ def history():
             ret.append('')
         ret.append(row[3])
         returns.append(ret)
-    print(len(returns))
     if len(returns) == 0:
         return render_template("history.html", rows = 0, balance = session['balance'])
     return render_template("history.html", rows=returns, balance=session['balance'])
@@ -103,7 +99,8 @@ def login():
 
         # Ensure email exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0][2], request.form.get("password")):
-            return apology("invalid email and/or password", 403)
+            flash("invalid email and/or password")
+            return render_template("login.html")
 
         # Remember which user has logged in
         session["user_id"] = rows[0][0]
@@ -242,7 +239,6 @@ def change():
             return apology("Passwords do not match", 403)
         hashval = generate_password_hash(npassword)
         statement = "UPDATE users SET hash= '{0}' WHERE id= {1}".format(hashval, session["user_id"])
-        print(statement)
         db.execute(statement)
         flash('Password Changed!')
         return redirect("/")
@@ -271,53 +267,56 @@ def catalogue():
 @app.route("/order", methods = ["GET", "POST"])
 @login_required
 def order():
-    print(request.method)
     if request.method == "GET":
-        print('bitch')
         statement = "SELECT * FROM products WHERE id = {0};".format(request.args.get("id"))
         item = db.execute(statement).fetchone()
         url = '/order?id='+str(item[3])
-        return render_template("order.html", item = item, url = url, nOrd = True)
+        return render_template("order.html", item = item, url = url, nOrd = True, date=date.today())
     elif request.method == "POST":
         expir = request.form.get("datefield")
         wtp = request.form.get("wtp")
 
         statement = "SELECT * FROM products WHERE id = {0};".format(request.args.get("id"))
         item = db.execute(statement).fetchone()
-        print(item)
+        if (float(wtp) + float(item[2])) > (float(session["balance"].strip("$"))):
+            flash("Insufficient funds. Please add money.")
+            return render_template("add.html", balance=session["balance"])
 
         statement = "INSERT INTO orders (user_id, product_id, wtp, expir) VALUES ({0}, {1}, {2}, '{3}');".format(session['user_id'], item[3], wtp, expir)
         db.execute(statement)
-
 
         statementAmt = "SELECT money FROM users WHERE id = {0}".format(session['user_id'])
         amt = db.execute(statementAmt).fetchone()[0]
         statement = "UPDATE users SET money = money - {0} WHERE id = {1}".format(amt, session['user_id'])
         db.execute(statement)
-        # this doesn't work yet 
+        # this doesn't work yet
 
-        return render_template("ordered.html", item = item)
+        return render_template("ordered.html", item = item, balance=session["balance"])
 
 
 @app.route("/pickup", methods=["GET", "POST"])
 @login_required
 def pickup():
     if request.method == "GET":
-        statement = "SELECT store, name, price, wtp, expir FROM orders JOIN products ON product_id=id"
+        statement = "SELECT store, name, price, wtp, building, room, expir FROM orders JOIN products ON product_id=products.id JOIN users ON orders.user_id=users.id"
         infoList = db.execute(statement).fetchall()
-
-        # check to see if expiring Soon
-        current = datetime.datetime.now()
+        expDates = []
         for i in infoList:
-            expirInfo = map(int, infoList[i][4].split('-'))
-            if (current.month == expirInfo[1]):
-                if (expirInfo[2] - current.day < 3):
-                    infoList[i][4] = True
-            elif (expirInfo[2] - current.day > 28):
-                infoList[i][4] = True
-            else:
-                infoList[i][4] = False
-        return render_template("pickup.html", infoList=infoList, balance=session["balance"])
+            expirInfo = map(int, i[6].split('-'))
+            exp = datetime(expirInfo[0], expirInfo[1], expirInfo[2])
+            expDates.append(exp)
+        return render_template("pickup.html", infoList=infoList, current=date.today(), expDates=expDates, balance=session["balance"])
+
+@app.route("/userorders")
+@login_required
+def userorders():
+    if (request.args.get("cancelId")):
+        statement = "DELETE FROM orders WHERE id='{0}';".format(request.args.get("cancelId"))
+        db.execute(statement)
+    statement = "SELECT orders.id, name, store, wtp, price, expir FROM orders JOIN products ON product_id=products.id WHERE user_id='{0}'".format(session["user_id"])
+    rows = db.execute(statement).fetchall()
+    return render_template("userorders.html", rows=rows, balance=session["balance"])
+
 
 def errorhandler(e):
     """Handle error"""

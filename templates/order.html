@@ -19,7 +19,7 @@
             <label for="wtp">How much are you willing to pay to get this delivered to your door?</label><br>
             <input autocomplete="off" autofocus class="form-control" name="wtp" id ="wtp" placeholder="Amount ($)" type="number" min = "0"><br><br>
             <label for="datePickerId">When should this order automatically expire?</label><br>
-            <input autocomplete="off" autofocus class="form-control" name="datefield" id ="datePickerId" placeholder="Time" type="date"><br><br><br>
+            <input autocomplete="off" autofocus class="form-control" name="datefield" id ="datePickerId" placeholder="Time" type="date" min="{{date}}"><br><br><br>
             <button class="btn btn-primary" type="submit">Submit</button>
           </form>
         </div>

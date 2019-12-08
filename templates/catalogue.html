@@ -12,16 +12,49 @@
     <form action="/catalogue" method="POST">
         <div class="form-group">
           <select name="store" onchange="this.form.submit()">
-            <option value="" hidden>--</option>
-            {% for store in stores %}
-              <option value="{{store}}">{{store}}</option>
+            <option value="" selected>--</option>
+            {% for s in stores %}
+              {% if s == store %}
+                <option value="{{s}}" selected>{{s}}</option>
+              {% else %}
+                <option value="{{s}}">{{s}}</option>
+              {% endif %}
+
             {% endfor %}
           </select>
         </div>
     </form>
+    <br>
+    {% if prod %}
+      <input class="form-control" type="text" id="searchBox" placeholder="Search for products..." onkeyup=filter()>
+    {% endif %}
+    <script>
+        function filter() {
+        // Declare variables
+        var searchterm, filter, namelist, pricelist, a, i, txtValue;
+        searchterm = document.getElementById('searchBox');
+        filter = searchterm.value.toUpperCase();
+        namelist = document.getElementsByClassName('productName');
+        pricelist = document.getElementsByClassName('priceIndex');
+
+        // Loop through all list items, and hide those who don't match the search query
+        for (i = 0; i < namelist.length; i++) {
+          a = namelist[i].getElementsByTagName("a")[0];
+
+          txtValue = a.textContent || a.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            namelist[i].style.display = "";
+            pricelist[i].style.display = "";
+          } else {
+            namelist[i].style.display = "none";
+            pricelist[i].style.display = "none";
+          }
+        }
+      }
+    </script> <!--Credit to: https://www.w3schools.com/howto/howto_js_filter_lists.asp-->
     <br><br>
     <h3>{{ store }}</h3>
-    <table class = "table table-striped">
+    <table class = "table table-striped" id="productTable">
     {% if prod %}
       <p1> Click on an item to order it</p1>
       <tr>
@@ -30,9 +63,9 @@
       </tr>
     {% endif %}
     {% for i in range(names|length) %}
-        <tr>
-          <td class = "align"><a href={{ product_ids[i] }}>{{names[i]}}</a></td>
-          <td class = "align">{{prices[i]}}</td>
+          <tr>
+          <td class=" align productName"><a href={{ product_ids[i] }}>{{names[i]}}</a></td>
+          <td class = "align priceIndex">${{prices[i]}}</td>
     {% endfor %}
     </table>
 {% endblock %}

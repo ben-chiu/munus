@@ -44,12 +44,12 @@ main img
 }
 
 .formbox2{
-  text-align: left;
   margin: auto;
   background-color: lightgrey;
   border-style: solid;
   border-color: #303944;
   border-width: 5px;
+  max-width: 500px;
   padding: 50px;
 }
 

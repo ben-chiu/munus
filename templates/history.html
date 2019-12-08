@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Portfolio
+    History
 {% endblock %}
 
 
 {% block main %}
-{% if rows != 0 %}
+{% if rows > 0 %}
       <table class="table table-striped">
           <thead>
               <tr>
@@ -31,6 +31,6 @@
       </table>
   {% else %}
       <h3>No transaction history yet</h3>
-      <h4><a href = '/add'>Let's get some orders in!</a></h4>
+      <h4><a href = '/order'>Let's get some orders in!</a></h4>
   {% endif %}
 {% endblock %}

@@ -7,7 +7,7 @@ db = database.cursor()
 a = input('what function do you want to do?')
 
 if a == 'create':
-    db.execute('CREATE TABLE orders(user_id INTEGER, product_id INTEGER, wtp INTEGER, expir TIME);')
+    db.execute('CREATE TABLE orders(user_id INTEGER, product_id INTEGER, wtp INTEGER, expir TIME, id INTEGER PRIMARY KEY);')
 
 if a == 'test':
     print(len(db.execute('SELECT * FROM orders').fetchall()))
@@ -52,3 +52,6 @@ if a == 'x':
                 time.sleep(4)
         if j%1000 == 0:
             print(j)
+
+if a == "clear":
+    db.execute("DROP TABLE orders")

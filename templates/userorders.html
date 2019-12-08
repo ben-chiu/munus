@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    User Orders
+{% endblock %}
+
+
+{% block main %}
+{% if rows|length > 0 %}
+      <table class="table table-striped">
+          <thead>
+              <tr>
+                  <b><th>OrderID</th></b>
+                  <th>Product</th>
+                  <th>Store</th>
+                  <th>Amount</th>
+                  <th>Expiration Date</th>
+                  <th>Cancel?<th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for row in rows %}
+                  <tr>
+                      <td>{{row[0]}}</td>
+                      <td>{{row[1]}}</td>
+                      <td>{{row[2]}}</td>
+                      <td>{{row[3] + row[4]}}</td>
+                      <td>{{row[5]}}</td>
+                      <td><a href="/userorders?cancelId={{row[0]}}">Cancel</a></td>
+                  </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+  {% else %}
+      <h4>You have no current orders</h4>
+  {% endif %}
+  <a href="/catalogue"><button class="btn btn-primary">Start a new order</button>
+{% endblock %}

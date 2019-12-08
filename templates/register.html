@@ -6,46 +6,44 @@
 
 {% block main %}
     <div class="formbox2">
-      <h2 style="text-decoration: underline; text-align:center;"> Register </h2>
-      <form action="/register" method="post" class = "align">
+      <h1 class="darkgreen"> Register </h1>
+      <br>
+      <form action="/register" method="post">
         <div class="form-group">
             <input autocomplete="off" autofocus class="form-control" name="email" id ="email" placeholder="Email" type="email">
         </div>
-        <div class="form-row">
-          <div class="form-group col-md-5">
+        <div class="form-group">
               <input class="form-control" name="password" id="password1" placeholder="Password" type="password">
-          </div>
-          <div class="form-group col-md-5">
-              <input class="form-control" name="confirmation" id = "password2" placeholder="Confirm Password" type="password">
-          </div>
         </div>
-        <div class="form-row">
-          <div class="form-group col-md-5">
-              <select class="form-control" name="building" id="dorm">
-                <option value="" selected disabled hidden>Dorm</option>
-                <option value="Apley Court">Apley Court</option>
-                <option value="Canaday">Canaday</option>
-                <option value="Grays">Grays</option>
-                <option value="Greenough">Greenough</option>
-                <option value="Hollis">Hollis</option>
-                <option value="Holworthy">Holworthy</option>
-                <option value="Lionel">Lionel</option>
-                <option value="Mower">Mower</option>
-                <option value="Mass Hall">Mass Hall</option>
-                <option value="Matthews">Matthews</option>
-                <option value="Pennypacker">Pennypacker</option>
-                <option value="Stoughton">Stoughton</option>
-                <option value="Straus">Straus</option>
-                <option value="Thayer">Thayer</option>
-                <option value="Weld">Weld</option>
-                <option value="Wigglesworth">Wigglesworth</option>
-            </select>
-          </div>
-        <div class="form-group col-md-5">
+        <div class="form-group">
+              <input class="form-control" name="confirmation" id = "password2" placeholder="Confirm Password" type="password">
+        </div>
+        <div class="form-group">
+            <select class="form-control" name="building" id="dorm">
+              <option value="" selected disabled hidden>Dorm</option>
+              <option value="Apley Court">Apley Court</option>
+              <option value="Canaday">Canaday</option>
+              <option value="Grays">Grays</option>
+              <option value="Greenough">Greenough</option>
+              <option value="Hollis">Hollis</option>
+              <option value="Holworthy">Holworthy</option>
+              <option value="Lionel">Lionel</option>
+              <option value="Mower">Mower</option>
+              <option value="Mass Hall">Mass Hall</option>
+              <option value="Matthews">Matthews</option>
+              <option value="Pennypacker">Pennypacker</option>
+              <option value="Stoughton">Stoughton</option>
+              <option value="Straus">Straus</option>
+              <option value="Thayer">Thayer</option>
+              <option value="Weld">Weld</option>
+              <option value="Wigglesworth">Wigglesworth</option>
+          </select>
+        </div>
+        <div class="form-group">
             <input class="form-control" name="room" id="room" placeholder="Room Number" type="integer">
             <br><br>
         </div>
-        <button class="btn btn-primary btn-lg btn-block" type="submit">Register</button>
+        <button class="btn btn-primary btn-lg" type="submit">Register</button>
       </form>
     </div>
 {% endblock %}

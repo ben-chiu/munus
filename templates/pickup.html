@@ -5,25 +5,34 @@
 {% endblock %}
 
 {% block main %}
-<h2>Pickup</h2><br>
-<h4>Current Orders</h4>
-<table class = "table table-striped">
-  <tr>
-    <th>Store</th>
-    <th>Product</th>
-    <th>Price</th>
-    <th>Delivery Payment</th>
-    <th>Expiring Soon?</th>
-  </tr>
-  {% for i in range(names|length) %}
+  <h2>Pickup</h2><br>
+  {% if infoList|length > 0 %}
+    <h4>Current Orders</h4>
+    <table class = "table table-striped">
       <tr>
-        <td class = "align">{{infoList[i][0]}}</td>
-        <td class = "align">{{infoList[i][1]}}</td>
-        <td class = "align">{{infoList[i][2]}}</td>
-        <td class = "align">{{infoList[i][3]}}</td>
-        {% if infoList[i][4]%}
-        {% endif %}
+        <th>Store</th>
+        <th>Product</th>
+        <th>Price</th>
+        <th>Delivery Payment</th>
+        <th>Location</th>
+        <th>Expiring Soon?</th>
       </tr>
-  {% endfor %}
-</table>
+      {% for i in range(infoList|length) %}
+          <tr>
+            <td class = "align">{{infoList[i][0]}}</td>
+            <td class = "align">{{infoList[i][1]}}</td>
+            <td class = "align">${{infoList[i][2]}}</td>
+            <td class = "align">${{infoList[i][3]}}</td>
+            <td class = "align">{{infoList[i][4]}} {{infoList[i][5]}}<td>
+            {% if expDates[i] -  current < 2 %}
+              <td class = "align">Yes</td>
+            {% else %}
+              <td class = "align">No</td>
+            {% endif %}
+          </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <h4>Sorry, there are no current orders. Please check back soon!</h4>
+  {% endif %}
 {% endblock %}
