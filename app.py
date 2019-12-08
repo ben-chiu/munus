@@ -69,6 +69,7 @@ if lastDay[:-2] != currDay:
     orders = db.execute("SELECT expir, id FROM orders;").fetchall()
     badOrders = []
     for i in orders:
+        print(i)
         if compareDays(i[0], currDay):
             badOrders.append(i[1])
 
@@ -88,9 +89,9 @@ if lastDay[:-2] != currDay:
         db.execute(statement)
 
 # write into the file the current day
-#f = open('day.txt', 'w')
-#print(currDay, file = f)
-#f.close()
+f = open('day.txt', 'w')
+print(currDay, file = f)
+f.close()
 
 # the homepage
 @app.route("/")
@@ -360,6 +361,7 @@ def order():
         return render_template("order.html", item = item, url = url, nOrd = True, date=date.today(), balance=session["balance"])
     elif request.method == "POST":
         expir = request.form.get("datefield")
+        print(expir)
         wtp = request.form.get("wtp")
         quantity = int(request.form.get("quantity"))
 
@@ -377,13 +379,13 @@ def order():
         db.execute(statement)
 
         statementAmt = "SELECT money FROM users WHERE id = {0}".format(session['user_id'])
-        amt = db.execute(statementAmt).fetchone()[0] * quantity
+        amt = db.execute(statementAmt).fetchone()[0]
 
-        statement = "UPDATE users SET money = money - {0} WHERE id = {1}".format((float(wtp.replace(',','')) + float(item[2]))*quantity, session['user_id'])
+        statement = "UPDATE users SET money = money - {0} WHERE id = {1}".format(float(wtp.replace(',','')) + float(item[2])*quantity, session['user_id'])
         db.execute(statement)
 
         # this does work
-        session["balance"] = usd(amt - float(wtp.replace(',','')) - float(item[2]))
+        session["balance"] = usd(amt - float(wtp.replace(',','')) - float(item[2]) * quantity)
 
         return render_template("ordered.html", item = item, balance=session["balance"])
 
@@ -394,6 +396,7 @@ def pickup():
     if (request.args.get("pickedupID")):
         #find value of order refund
         statement = "SELECT price, quantity, wtp, product_id FROM orders JOIN products ON product_id=products.id WHERE orders.id={0};".format(request.args.get("pickedupID"))
+        #statement = "SELECT price, quantity, wtp, product_id FROM orders JOIN products ON product_id=products.id"
         vals = db.execute(statement).fetchone()
         print(vals)
         refund = vals[0]*vals[1] + vals[2]
@@ -411,13 +414,31 @@ def pickup():
         db.execute(statement)
         # add to pickup history
         statement = "INSERT INTO history (user_id, type, product_id, amount) VALUES ({0}, 'PICKUP', {1}, {2})".format(session['user_id'], vals[3], refund)
-
+        db.execute(statement)
 
         #delete order
         statement = "DELETE FROM orders WHERE id='{0}';".format(request.args.get("pickedupID"))
         db.execute(statement)
 
-    statement = "SELECT store, name, price, wtp, building, room, expir, quantity, orders.id FROM orders JOIN products ON product_id=products.id JOIN users ON orders.user_id=users.id"
+    statement = "SELECT store, name, price, wtp, building, room, expir, quantity, orders.id FROM orders JOIN products ON product_id=products.id JOIN users ON orders.user_id=users.id WHERE user_id != {0}".format(session['user_id'])
+    label = ''
+    if request.args.get('filter'):
+        filter = request.args.get('filter')
+        print(filter)
+        if filter in ('Ivy', 'Crimson', 'Elm', 'Oak'):
+            dormToYard = {'Ivy': ('Apley Court', 'Hollis', 'Holworthy', 'Lionel', 'Mass Hall', 'Mower', 'Stoughton', 'Straus'),
+                           'Crimson': ('Greenough', 'Hurlbut', 'Pennypacker', 'Wigglesworth'),
+                           'Elm': ('Grays', 'Matthews', 'Weld'),
+                           'Oak': ('Canaday', 'Thayer')}
+            yard = dormToYard[filter]
+            label = filter + " Yard"
+            statement = "SELECT store, name, price, wtp, building, room, expir, quantity, orders.id FROM orders JOIN products ON product_id=products.id JOIN users on orders.user_id=users.id WHERE users.building in {1} AND user_id != {0};".format(session['user_id'], dormToYard[filter])
+            print(statement)
+        elif filter in ('CVS', 'saloniki','crimsoncorner','animezakka','swissbakers','&pizza'):
+            label = filter
+            statement = "SELECT store, name, price, wtp, building, room, expir, quantity, orders.id FROM orders JOIN products ON product_id=products.id JOIN users on orders.user_id=users.id WHERE products.store = '{1}' AND user_id != {0};".format(session['user_id'], filter)
+            print(statement)
+
     infoList = db.execute(statement).fetchall()
     current = date.today()
     expSoon = []
@@ -433,7 +454,7 @@ def pickup():
     for i in range(len(infoList)):
         urls.append('/pickup?pickedupID=' + str(infoList[i][8]))
 
-    return render_template("pickup.html", infoList=infoList, urls = urls, expSoon=expSoon, balance=session["balance"])
+    return render_template("pickup.html", infoList=infoList, urls = urls, expSoon=expSoon, label = label, balance=session["balance"])
 
 
 

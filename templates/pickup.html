@@ -4,10 +4,54 @@
     Pickup
 {% endblock %}
 
+<script>
+  function gotosite(){
+    window.location.replace(document.getElementById("filter").value);
+
+  }
+</script>
+
+
+
 {% block main %}
   <h2>Pickup</h2><br>
   {% if infoList|length > 0 %}
-    <h4>Current Orders</h4>
+  <h4>Current Orders</h4>
+  <br>
+
+
+  <p1>Yard: </p1>
+  <form name = "filter" style="display:inline-block;">
+    <select name = "menu" onchange = "window.document.location.href=this.options[this.selectedIndex].value;" value="GO">
+      <option value = "" hidden>None</option>
+      <option value = "/pickup?filter=Ivy">Ivy</option>
+      <option value = "/pickup?filter=Crimson">Crimson</option>
+      <option value = "/pickup?filter=Elm">Elm</option>
+      <option value = "/pickup?filter=Oak">Oak</option>
+    </select>
+  </form>
+  <p1> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Store: </p1>
+  <form name = "filter" style = "display:inline-block">
+    <select name = "menu" onchange = "window.document.location.href=this.options[this.selectedIndex].value;" value="GO">
+      <option value = "" hidden>None</option>
+      <option value = "/pickup?filter=CVS">CVS</option>
+      <option value = "/pickup?filter=crimsoncorner">Crimson Corner</option>
+      <option value = "/pickup?filter=animezakka">Anime Zakka</option>
+      <option value = "/pickup?filter=&pizza">&pizza</option>
+      <option value = "/pickup?filter=saloniki">Saloniki</option>
+      <option value = "/pickup?filter=swissbakers">Swissbakers</option>
+    </select>
+  </form>
+
+
+
+  <br><br>
+
+  {% if label != "" %}
+    <h4> Filters: {{ label }} </h4>
+  {% endif %}
+
+
     <table class = "table table-striped">
       <tr>
         <th>Store</th>

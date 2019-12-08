@@ -54,24 +54,13 @@ if a == 'x':
         if j%1000 == 0:
             print(j)
 
-if a == "clear":
-    db.execute("DROP TABLE orders")
+if a == "add":
+    db.execute("UPDATE users SET money = 10000000 WHERE email = 'a@a.a';")
 
-<<<<<<< HEAD
-
-if a == "alter":
-    db.execute("ALTER TABLE orders ADD quantity INTEGER NOT NULL DEFAULT 1")
-
-=======
->>>>>>> ac78b433572c01b8e6f00a68c94b3fcec8c8f16c
 if a =='day':
     f = open('day.txt', 'w')
     print(date.today(), file = f)
     f.close()
-<<<<<<< HEAD
 
-if a =='5am':
-    print(db.execute('SELECT orders.id FROM orders').fetchall())
-    print(db.execute('SELECT orders.id FROM orders JOIN products ON product_id = products.id;').fetchall())
-=======
->>>>>>> ac78b433572c01b8e6f00a68c94b3fcec8c8f16c
+if a == 'delete':
+    db.execute("DELETE FROM orders WHERE expir = '';")
