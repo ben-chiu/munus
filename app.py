@@ -350,6 +350,38 @@ def catalogue():
     product_ids = ['/order?id='+str(j[2]) for j in productlist]
     return render_template("catalogue.html", stores = stores, product_ids = product_ids, store = store, names=names, prod = True, prices = prices, balance=session["balance"], storeReplace = storeReplace)
 
+@app.route("/suggested")
+@login_required
+def suggested():
+    #get list of all productIDs from history
+    statement = "SELECT product_id FROM orders"
+    productidsraw = db.execute(statement).fetchall()
+
+    productidssorted = {}
+    for productID in productidsraw:
+        #for each one, put it into a dictionary that counts number of times its in history
+        #if already in dicitonary, add one to value, if not, make new key and set value to 1
+        if productID in productidssorted:
+            productidssorted[productID] += 1
+        else:
+            productidssorted[productID] = 1
+    sorted(productidssorted.items(), key = lambda kv:(kv[1], kv[0])) #sorts dict by value
+
+    #add in corresponding names for sorted product ID list
+    names = []
+    product_ids = []
+    for productID in productidssorted:
+        statement = "SELECT name, product_id FROM produts WHERE product_id={0}".format(productID)
+        item = db.execute(statement).fetchone()
+        names.append(item[0])
+        names = [name.replace('\\\'','').replace('\\\"','') for name in names] # strips the backslashes from the names of the products
+        product_ids.append('/order?id='+str(item[1]))
+    print(productidsraw)
+    print(productidssorted)
+    print(product_ids)
+    print(names)
+    return render_template("suggested.html", product_ids=product_ids, names=names, balance=session["balance"])
+
 @app.route("/order", methods = ["GET", "POST"])
 @login_required
 def order():
