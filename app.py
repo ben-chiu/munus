@@ -91,14 +91,33 @@ if lastDay[:-2] != currDay:
 
 # write into the file the current day
 f = open('day.txt', 'w')
-print(currDay, file = f)
+try:
+    print(f, currDay)
+except Exception, e:
+    execute('print(currDay, file = f)')
 f.close()
 
 # the homepage
 @app.route("/")
 @login_required
 def index():
-    return render_template("index.html", balance = session["balance"])
+    #get number of instances of each item in history
+    statement = "SELECT product_id, COUNT(*) FROM history GROUP BY product_id"
+    instances = db.execute(statement).fetchall()
+    instances.sort(key=itemgetter(1), reverse=True)
+
+    #add in corresponding names for sorted product ID list
+    names = []
+    product_ids = []
+    if len(instances) != 0:
+        for product in instances:
+            if product[0] != -1:
+                statement = "SELECT name FROM products WHERE id={0}".format(product[0])
+                item = db.execute(statement).fetchone()
+                names.append(item[0])
+                names = [name.replace('\\\'','').replace('\\\"','') for name in names] # strips the backslashes from the names of the products
+                product_ids.append('/order?id='+str(product[0]))
+    return render_template("index.html", product_ids=product_ids, names=names, balance=session["balance"])
 
 # shows the user a list of their completed transactions, including deposits, withdrawals, orders, and pickups
 @app.route("/history")
@@ -355,10 +374,9 @@ def catalogue():
 @login_required
 def suggested():
     #get list of all productIDs from history
-    statement = "SELECT product_id, COUNT(*) FROM history GROUP BY product_id"
+    statement = "SELECT product_id, COUNT(*) FROM history WHERE user_id={0} GROUP BY product_id".format(session["user_id"])
     instances = db.execute(statement).fetchall()
     instances.sort(key=itemgetter(1), reverse=True)
-    print(instances)
 
     #add in corresponding names for sorted product ID list
     names = []

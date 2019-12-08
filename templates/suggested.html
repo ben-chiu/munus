@@ -5,46 +5,52 @@
 {% endblock %}
 
 {% block main %}
-    <h1>Suggested Items</h1>
-    <h4>Check out some of our most popular items!</h4>
-    <br>
-    <input class="form-control" type="text" id="searchBox" placeholder="Search for products..." onkeyup=filter()>
-    <script>
-        function filter() {
-        // Declare variables
-        var searchterm, filter, namelist, pricelist, a, i, txtValue;
-        searchterm = document.getElementById('searchBox');
-        filter = searchterm.value.toUpperCase();
-        namelist = document.getElementsByClassName('productName');
-        indexlist = document.getElementsByClassName('productName');
+    <h1>Suggested For You</h1>
+    {% if names|length > 0 %}
+      <h4>Here are some of your most popular items!</h4>
+      <br>
+      <input class="form-control" type="text" id="searchBox" placeholder="Search for products..." onkeyup=filter()>
+      <script>
+          function filter() {
+          // Declare variables
+          var searchterm, filter, namelist, pricelist, a, i, txtValue;
+          searchterm = document.getElementById('searchBox');
+          filter = searchterm.value.toUpperCase();
+          namelist = document.getElementsByClassName('productName');
+          indexlist = document.getElementsByClassName('productName');
 
-        // Loop through all list items, and hide those who don't match the search query
-        for (i = 0; i < namelist.length; i++) {
-          a = namelist[i].getElementsByTagName("a")[0];
+          // Loop through all list items, and hide those who don't match the search query
+          for (i = 0; i < namelist.length; i++) {
+            a = namelist[i].getElementsByTagName("a")[0];
 
-          txtValue = a.textContent || a.innerText;
-          if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            indexlist[i].style.display = "";
-            namelist[i].style.display = "";
-          } else {
-            indexlist[i].style.display = "none";
-            namelist[i].style.display = "none";
+            txtValue = a.textContent || a.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              indexlist[i].style.display = "";
+              namelist[i].style.display = "";
+            } else {
+              indexlist[i].style.display = "none";
+              namelist[i].style.display = "none";
+            }
           }
         }
-      }
-    </script> <!--Credit to: https://www.w3schools.com/howto/howto_js_filter_lists.asp-->
-    <br><br>
-    <table class = "table table-striped" id="productTable">
-    <p1> Click on an item to order it</p1>
-    <tr>
-      <th class = "align">Rank</th>
-      <th class = "align">Product</th>
-    </tr>
-    {% for i in range(names|length) %}
-          <tr>
-            <td class="align index">{{i + 1}}</td>
-            <td class=" align productName"><a href={{ product_ids[i] }}>{{names[i]}}</a></td>
-          </tr>
-    {% endfor %}
-    </table>
+      </script> <!--Credit to: https://www.w3schools.com/howto/howto_js_filter_lists.asp-->
+      <br><br>
+      <table class = "table table-striped" id="productTable">
+      <p1> Click on an item to order it</p1>
+      <tr>
+        <th class = "align">Rank</th>
+        <th class = "align">Product</th>
+      </tr>
+      {% for i in range(100) %}
+        {% if i <= (names|length - 1) %}
+            <tr>
+              <td class="align index">{{i + 1}}</td>
+              <td class=" align productName"><a href={{ product_ids[i] }}>{{names[i]}}</a></td>
+            </tr>
+        {% endif %}
+      {% endfor %}
+      </table>
+    {% else %}
+    <h3>Sorry, there are no orders in your history!</h3>
+    {% endif %}
 {% endblock %}
