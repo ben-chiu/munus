@@ -300,12 +300,16 @@ def pickup():
     if request.method == "GET":
         statement = "SELECT store, name, price, wtp, building, room, expir FROM orders JOIN products ON product_id=products.id JOIN users ON orders.user_id=users.id"
         infoList = db.execute(statement).fetchall()
-        expDates = []
+        current = date.today()
+        expSoon = []
         for i in infoList:
             expirInfo = map(int, i[6].split('-'))
-            exp = datetime(expirInfo[0], expirInfo[1], expirInfo[2])
-            expDates.append(exp)
-        return render_template("pickup.html", infoList=infoList, current=date.today(), expDates=expDates, balance=session["balance"])
+            exp = date(expirInfo[0], expirInfo[1], expirInfo[2])
+            if (exp - current) < 2:
+                expSoon.append("Yes")
+            else:
+                expSoon.append("No")
+        return render_template("pickup.html", infoList=infoList, expSoon=expSoon, balance=session["balance"])
 
 @app.route("/userorders")
 @login_required
