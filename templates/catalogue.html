@@ -12,12 +12,12 @@
     <form action="/catalogue" method="POST">
         <div class="form-group">
           <select name="store" onchange="this.form.submit()">
-            <option value="" selected>--</option>
+            <option value="any" selected>Any store</option>
             {% for s in stores %}
               {% if s == store %}
-                <option value="{{s}}" selected>{{s}}</option>
+                <option value="{{s}}" selected>{{ storeReplace.get(s,s) }}</option>
               {% else %}
-                <option value="{{s}}">{{s}}</option>
+                <option value="{{s}}">{{ storeReplace.get(s,s) }}</option>
               {% endif %}
 
             {% endfor %}
@@ -53,7 +53,7 @@
       }
     </script> <!--Credit to: https://www.w3schools.com/howto/howto_js_filter_lists.asp-->
     <br><br>
-    <h3>{{ store }}</h3>
+    <h3>{{ storeReplace.get(store, store) }}</h3>
     <table class = "table table-striped" id="productTable">
     {% if prod %}
       <p1> Click on an item to order it</p1>

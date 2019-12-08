@@ -23,6 +23,21 @@ stripe.api_key = secret_key
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
+def compareDays(d1, d2):
+    '''function to compare days
+        inputs: two days in format yyyy-mm-dd
+        outputs True if d1 < d2, else false'''
+    d1 = list(map(int, d1.split('-')))
+    d2 = list(map(int, d2.split('-')))
+    for i in range(3):
+        if d1[i] < d2[i]:
+            return(True)
+    return(False)
+
+
+
+
+
 # Ensure responses aren't cached
 @app.after_request
 def after_request(response):
@@ -41,20 +56,56 @@ app.config["SESSION_FILE_DIR"] = mkdtemp()
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
+# open the database as db with autocommit on
 database = sqlite3.connect('munus.db', isolation_level = None, check_same_thread = False)
 db = database.cursor()
 
+#checking to see if the last stored day is the current day, if not, removing all the expired orders
+f = open('day.txt', 'r')
+lastDay = f.readline()
+f.close()
+currDay = str(date.today())
+if lastDay[:-2] != currDay:
+    orders = db.execute("SELECT expir, id FROM orders;").fetchall()
+    badOrders = []
+    for i in orders:
+        if compareDays(i[0], currDay):
+            badOrders.append(i[1])
+
+    # for each bad order, going into the user id and adding the price * quantity + tip back to their money
+    for i in badOrders:
+        statement = "SELECT user_id, product_id, quantity, wtp FROM orders WHERE id = {0};".format(i)
+        order = db.execute(statement).fetchone()
+        statement = "SELECT price FROM products WHERE id = {0};".format(order[1])
+
+        p = db.execute(statement).fetchone()[0]
+        total = p * order[2] + order[3]
+        statement = "UPDATE users SET money = money + {0} WHERE id = {1};".format(total, order[0])
+        db.execute(statement)
+
+        # delete the expired order
+        statement = "DELETE FROM orders WHERE id = {0};".format(i)
+        db.execute(statement)
+
+# write into the file the current day
+f = open('day.txt', 'w')
+print(currDay, file = f)
+f.close()
+
+# the homepage
 @app.route("/")
 @login_required
 def index():
     return render_template("index.html", balance = session["balance"])
 
+# shows the user a list of their completed transactions, including deposits, withdrawals, orders, and pickups
 @app.route("/history")
 @login_required
 def history():
     statement = "SELECT type, product_id, amount, timestamp FROM history WHERE user_id={0}".format(session["user_id"])
     rows = db.execute(statement).fetchall()
 
+    # select each transaction, then return the type, store, product name, and amount
     returns = []
     for row in rows:
         ret = [] # type, amt, store, productname
@@ -70,6 +121,7 @@ def history():
             ret.append('')
         ret.append(row[3])
         returns.append(ret)
+    # if their history is empty, we want a different page that says they have no history
     if len(returns) == 0:
         return render_template("history.html", rows = 0, balance = session['balance'])
     return render_template("history.html", rows=returns, balance=session['balance'])
@@ -169,6 +221,7 @@ def register():
         return redirect("/add")
 
 
+# sends them to the add page when they try to add money
 @app.route("/add")
 @login_required
 def add():
@@ -176,6 +229,7 @@ def add():
         return render_template("add.html", balance=session["balance"])
 
 
+# adds the amount to the payment
 @app.route("/payment")
 @login_required
 def payment():
@@ -186,7 +240,7 @@ def payment():
         session["add"] = a
         return render_template("payment.html", pub_key=pub_key, amount=a, dollars=usd(a/100), balance=session["balance"])
 
-
+# uses the stripe API to add the money to the user database. it also adds to history
 @app.route("/charge", methods=["POST"])
 @login_required
 def charge():
@@ -214,7 +268,7 @@ def charge():
 def success():
     return render_template("success.html")
 
-
+# allows for changing a password
 @app.route("/change", methods=["GET", "POST"])
 @login_required
 def change():
@@ -238,6 +292,8 @@ def change():
         if not npassword == confirmation:
             return apology("Passwords do not match", 403)
         hashval = generate_password_hash(npassword)
+
+        # updates the password to the new value using the user id
         statement = "UPDATE users SET hash= '{0}' WHERE id= {1}".format(hashval, session["user_id"])
         db.execute(statement)
         flash('Password Changed!')
@@ -246,28 +302,58 @@ def change():
 @app.route("/catalogue", methods=["GET", "POST"])
 @login_required
 def catalogue():
+    '''
     if request.method == "GET":
         statement = "SELECT DISTINCT store FROM products"
         storelist = db.execute(statement).fetchall()
         stores = [i[0] for i in storelist]
-        return render_template("catalogue.html", stores=stores, balance=session["balance"], prod = False)
-    else:
-        statement = "SELECT DISTINCT store FROM products"
-        storelist = db.execute(statement).fetchall()
-        stores = [i[0] for i in storelist]
+        storeReplace = {'crimsoncorner': 'Crimson Corner',
+                        'animezakka': 'Anime Zakka',
+                        'swissbakers': 'Swissbakers',
+                        'saloniki': 'Saloniki',
+                        'any': 'Any store'}
 
-        store = request.form.get("store")
+        storeNames = [storeReplace.get(n,n) for n in stores]
+
+        return render_template("catalogue.html", stores=stores, balance=session["balance"], prod = False, storeReplace = storeReplace)
+    else:'''
+    statement = "SELECT DISTINCT store FROM products"
+    storelist = db.execute(statement).fetchall()
+    stores = [i[0] for i in storelist]
+
+    # the dictionary for replacing the database codes with more presentable text
+    storeReplace = {'crimsoncorner': 'Crimson Corner',
+                    'animezakka': 'Anime Zakka',
+                    'swissbakers': 'Swissbakers',
+                    'saloniki': 'Saloniki',
+                    'any': 'Any store'}
+
+    storeNames = [storeReplace.get(n,n) for n in stores]
+
+    store = request.form.get("store") # can also be "any"
+
+    # when the page is first opened, there won't be any store selected so automatically set it to any store
+    if not store:
+        store = 'any'
+
+    if store == "any" :
+        statement = "SELECT name, price, id FROM products"
+        productlist = db.execute(statement).fetchall()
+    else:
         statement = "SELECT name, price, id FROM products WHERE store='{0}';".format(store)
         productlist = db.execute(statement).fetchall()
-        names =[j[0] for j in productlist]
-        prices = [j[1] for j in productlist]
-        product_ids = ['/order?id='+str(j[2]) for j in productlist]
-        return render_template("catalogue.html", stores = stores, product_ids = product_ids, store = store, names=names, prod = True, prices = prices, balance=session["balance"])
+
+    # separate the values from the SQL query into its individual components
+    names =[j[0].replace('\\\'','').replace('\\\"','') for j in productlist] # strips the backslashes from the names of the products
+    prices = [j[1] for j in productlist]
+    product_ids = ['/order?id='+str(j[2]) for j in productlist]
+    return render_template("catalogue.html", stores = stores, product_ids = product_ids, store = store, names=names, prod = True, prices = prices, balance=session["balance"], storeReplace = storeReplace)
 
 @app.route("/order", methods = ["GET", "POST"])
 @login_required
 def order():
     if request.method == "GET":
+        # redirects the person to the order page for the individual product using the url
         statement = "SELECT * FROM products WHERE id = {0};".format(request.args.get("id"))
         item = db.execute(statement).fetchone()
         url = '/order?id='+str(item[3])
@@ -311,7 +397,7 @@ def pickup():
         current = date.today()
         expSoon = []
         for i in infoList:
-            expirInfo = map(int, i[6].split('-'))
+            expirInfo = list(map(int, i[6].split('-')))
             exp = date(expirInfo[0], expirInfo[1], expirInfo[2])
             if (exp - current).days < 2:
                 expSoon.append("Yes")
