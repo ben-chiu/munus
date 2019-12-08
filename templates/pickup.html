@@ -82,7 +82,13 @@
           </tr>
       {% endfor %}
     </table>
+  {% elif totalLen != 0 %}
+      <h4> There are no products for filter: {{ label }} </h4>
+      <br><br>
+      <form action='/pickup'>
+        <button class="btn btn-primary" type="submit">Return</button>
+      </form>
   {% else %}
     <h4>Sorry, there are no current orders. Please check back soon!</h4>
-  {% endif %}
+  {%- endif %}
 {% endblock %}

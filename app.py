@@ -475,6 +475,7 @@ def pickup():
         db.execute(statement)
 
     statement = "SELECT store, name, price, wtp, building, room, expir, quantity, orders.id FROM orders JOIN products ON product_id=products.id JOIN users ON orders.user_id=users.id WHERE user_id != {0} ORDER BY orders.wtp DESC".format(session['user_id'])
+    totalLen = len(db.execute(statement).fetchall())
     label = ''
     if request.args.get('filter'):
         filter = request.args.get('filter')
@@ -508,7 +509,7 @@ def pickup():
     for i in range(len(infoList)):
         urls.append('/pickup?pickedupID=' + str(infoList[i][8]))
 
-    return render_template("pickup.html", infoList=infoList, urls = urls, expSoon=expSoon, label = label, balance=session["balance"])
+    return render_template("pickup.html", infoList=infoList, urls = urls, expSoon=expSoon, label = label, balance=session["balance"], totalLen = totalLen)
 
 
 
