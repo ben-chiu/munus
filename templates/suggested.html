@@ -40,7 +40,7 @@
       <th class = "align">Rank</th>
       <th class = "align">Product</th>
     </tr>
-    {% for i in range(100) %}
+    {% for i in range(names|length) %}
           <tr>
             <td class="align index">{{i + 1}}</td>
             <td class=" align productName"><a href={{ product_ids[i] }}>{{names[i]}}</a></td>
