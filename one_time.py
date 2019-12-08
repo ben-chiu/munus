@@ -54,10 +54,13 @@ if a == 'x':
         if j%1000 == 0:
             print(j)
 
-if a == "clear":
-    db.execute("DROP TABLE orders")
+if a == "add":
+    db.execute("UPDATE users SET money = 10000000 WHERE email = 'a@a.a';")
 
 if a =='day':
     f = open('day.txt', 'w')
     print(date.today(), file = f)
     f.close()
+
+if a == 'delete':
+    db.execute("DELETE FROM orders WHERE expir = '';")

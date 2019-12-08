@@ -4,10 +4,59 @@
     Pickup
 {% endblock %}
 
+<script>
+  function gotosite(){
+    window.location.replace(document.getElementById("filter").value);
+
+  }
+</script>
+
+
+
 {% block main %}
   <h2>Pickup</h2><br>
   {% if infoList|length > 0 %}
-    <h4>Current Orders</h4>
+  <h4>Current Orders</h4>
+  <br>
+
+  <div class="dropdown show" style="display:inline-block">
+    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Yard
+    </a>
+
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+      <a class="dropdown-item" href="/pickup?filter=Ivy">Ivy Yard</a>
+      <a class="dropdown-item" href="/pickup?filter=Crimson">Crimson Yard</a>
+      <a class="dropdown-item" href="/pickup?filter=Elm">Elm Yard</a>
+      <a class="dropdown-item" href="/pickup?filter=Oak">Oak Yard</a>
+    </div>
+  </div>
+
+  <div class="dropdown show" style="display:inline-block">
+    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Store
+    </a>
+
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+      <a class="dropdown-item" href="/pickup?filter=CVS">CVS</a>
+      <a class="dropdown-item" href="/pickup?filter=crimsoncorner">Crimson Corner</a>
+      <a class="dropdown-item" href="/pickup?filter=saloniki">Saloniki</a>
+      <a class="dropdown-item" href="/pickup?filter=&pizza">&pizza</a>
+      <a class="dropdown-item" href="/pickup?filter=swissbakers">Swissbakers</a>
+      <a class="dropdown-item" href="/pickup?filter=animezakka">Anime Zakka</a>
+    </div>
+  </div>
+
+
+
+
+  <br><br>
+
+  {% if label != "" %}
+    <h4> Filters: {{ label }} </h4>
+  {% endif %}
+
+
     <table class = "table table-striped">
       <tr>
         <th>Store</th>
@@ -17,6 +66,7 @@
         <th>Delivery Payment</th>
         <th>Location</th>
         <th>Expiring Soon?</th>
+        <th></th>
       </tr>
       {% for i in range(infoList|length) %}
           <tr>
@@ -27,6 +77,7 @@
             <td class = "align">${{infoList[i][3]}}</td>
             <td class = "align">{{infoList[i][4]}} {{infoList[i][5]}}</td>
             <td class = "align">{{expSoon[i]}}</td>
+            <td class = "align"><a href = {{ urls[i] }}> Pick Up </a></td>
           </tr>
       {% endfor %}
     </table>
