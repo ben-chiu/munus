@@ -278,7 +278,8 @@ def order():
 
         statement = "SELECT * FROM products WHERE id = {0};".format(request.args.get("id"))
         item = db.execute(statement).fetchone()
-        if (float(wtp) + float(item[2])) > (float(session["balance"].strip("$"))):
+
+        if (float(wtp.replace(',','')) + float(item[2])) > (float(session["balance"].strip("$").replace(',',''))):
             flash("Insufficient funds. Please add money.")
             return render_template("add.html", balance=session["balance"])
 
@@ -287,9 +288,11 @@ def order():
 
         statementAmt = "SELECT money FROM users WHERE id = {0}".format(session['user_id'])
         amt = db.execute(statementAmt).fetchone()[0]
-        statement = "UPDATE users SET money = money - {0} WHERE id = {1}".format(amt, session['user_id'])
+        print(amt)
+        statement = "UPDATE users SET money = money - {0} WHERE id = {1}".format(float(wtp.replace(',','')) + float(item[2]), session['user_id'])
         db.execute(statement)
-        # this doesn't work yet
+        # this does work
+        session["balance"] = usd(amt - float(wtp.replace(',','')) - float(item[2]))
 
         return render_template("ordered.html", item = item, balance=session["balance"])
 

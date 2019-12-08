@@ -10,7 +10,7 @@ if a == 'create':
     db.execute('CREATE TABLE orders(user_id INTEGER, product_id INTEGER, wtp INTEGER, expir TIME, id INTEGER PRIMARY KEY);')
 
 if a == 'test':
-    print(len(db.execute('SELECT * FROM orders').fetchall()))
+    print(db.execute('SELECT * FROM orders').fetchall())
 
 if a == 'unique':
     db.execute("DROP TABLE history")
