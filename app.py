@@ -159,11 +159,13 @@ def login():
 
         # Ensure email was submitted
         if not request.form.get("email"):
-            return apology("must provide email", 403)
+            flash("You must provid an email")
+            return render_template("login.html")
 
         # Ensure password was submitted
         elif not request.form.get("password"):
-            return apology("must provide password", 403)
+            flash("You must provide a password.")
+            return render_template("login.html")
 
         # Query database for email
         statement = "SELECT * FROM users WHERE email = '{0}'".format(request.form.get("email").lower())
@@ -207,25 +209,32 @@ def register():
     else:
         e = request.form.get("email").lower()
         if not e:
-            return apology("Must provide email", 403)
+            flash("You must provide an email")
+            return render_template("register.html")
         emails = db.execute("SELECT email FROM users").fetchall()  # list of dictionaries containing emails
         for d in emails:  # for a given dictionary
             if e == d[0]:  # check to see if already in use
-                return apology("Email already in use", 403)
+                flash("Email already in use")
+                return render_template("register.html")
         password = request.form.get("password")
         confirmation = request.form.get("confirmation")
         building = request.form.get("building")
         room = request.form.get("room")
         if not password:
-            return apology("Must provide password", 403)
+            flash("You must provide a password")
+            return render_template("register.html")
         if not confirmation:
-            return apology("Must confirm password", 403)
+            flash("You must confirm your password")
+            return render_template("register.html")
         if not password == confirmation:
-            return apology("Passwords do not match", 403)
+            flash("Your passwords do not match")
+            return render_template("register.html")
         if not building:
-            return apology("Must provide building", 403)
+            flash("You must select a building")
+            return render_template("register.html")
         if not room:
-            return apology("Must provide room number", 403)
+            flash("You must provide a room")
+            return render_template("register.html")
         cust = stripe.Customer.create(email=e)
         stripeid = cust["id"]
         hashval = generate_password_hash(password)
@@ -275,7 +284,7 @@ def charge():
         session["balance"] = usd(balance)
         statement = "UPDATE users SET money = {0} WHERE id = {1}".format(balance, session['user_id'])
         db.execute(statement)
-        flash("money added succesfully")
+        flash("Money added succesfully!")
         statement = "INSERT INTO history (user_id, type, product_id, amount, timestamp) VALUES ({0}, 'deposit', -1, {1}, '{2}')".format(session['user_id'], a/100, datetime.now())
         db.execute(statement)
 
@@ -297,20 +306,25 @@ def change():
     else:
         opassword = request.form.get("opassword")
         if not opassword:
-            return apology("Must provide old password", 403)
+            flash("You must provide your old password")
+            return render_template("change.html")
 
         statement = "SELECT hash FROM users WHERE id = {0}".format(session["user_id"])
         h = db.execute(statement).fetchone()
         if not check_password_hash(h[0], opassword):
-            return apology("Incorrect old password", 403)
+            flash("Incorrect old password")
+            return render_template("change.html")
         npassword = request.form.get("npassword")
         confirmation = request.form.get("confirmation")
         if not npassword:
-            return apology("Must provide new password", 403)
+            flash("You must provide a new password")
+            return render_template("change.html")
         if not confirmation:
-            return apology("Must confirm new password", 403)
+            flash("You must confirm your old password")
+            return render_template("change.html")
         if not npassword == confirmation:
-            return apology("Passwords do not match", 403)
+            flash("You passwords do not match.")
+            return render_template("change.html")
         hashval = generate_password_hash(npassword)
 
         # updates the password to the new value using the user id
@@ -322,21 +336,6 @@ def change():
 @app.route("/catalogue", methods=["GET", "POST"])
 @login_required
 def catalogue():
-    '''
-    if request.method == "GET":
-        statement = "SELECT DISTINCT store FROM products"
-        storelist = db.execute(statement).fetchall()
-        stores = [i[0] for i in storelist]
-        storeReplace = {'crimsoncorner': 'Crimson Corner',
-                        'animezakka': 'Anime Zakka',
-                        'swissbakers': 'Swissbakers',
-                        'saloniki': 'Saloniki',
-                        'any': 'Any store'}
-
-        storeNames = [storeReplace.get(n,n) for n in stores]
-
-        return render_template("catalogue.html", stores=stores, balance=session["balance"], prod = False, storeReplace = storeReplace)
-    else:'''
     statement = "SELECT DISTINCT store FROM products"
     storelist = db.execute(statement).fetchall()
     stores = [i[0] for i in storelist]
