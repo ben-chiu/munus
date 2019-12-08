@@ -10,7 +10,6 @@
       <table class="table table-striped">
           <thead>
               <tr>
-                  <b><th>OrderID</th></b>
                   <th>Product</th>
                   <th>Store</th>
                   <th>Amount</th>
@@ -21,7 +20,6 @@
           <tbody>
               {% for row in rows %}
                   <tr>
-                      <td>{{row[0]}}</td>
                       <td>{{row[1]}}</td>
                       <td>{{row[2]}}</td>
                       <td>{{row[3] + row[4]}}</td>
