@@ -481,10 +481,10 @@ def pickup():
         # add to orderer history
         statement = "SELECT user_id FROM orders WHERE id = {0};".format(request.args.get('pickedupID'))
         user = db.execute(statement).fetchone()[0]
-        statement = "INSERT INTO history (user_id, type, product_id, amount, time) VALUES ({0}, 'ORDER', {1}, {2}, {3});".format(user, vals[3], -refund, datetime.now())
+        statement = "INSERT INTO history (user_id, type, product_id, amount) VALUES ({0}, 'ORDER', {1}, {2});".format(user, vals[3], -refund)
         db.execute(statement)
         # add to pickup history
-        statement = "INSERT INTO history (user_id, type, product_id, amount, time) VALUES ({0}, 'PICKUP', {1}, {2}, {3})".format(session['user_id'], vals[3], refund, datetime.now())
+        statement = "INSERT INTO history (user_id, type, product_id, amount) VALUES ({0}, 'PICKUP', {1}, {2})".format(session['user_id'], vals[3], refund)
         db.execute(statement)
 
         #delete order
