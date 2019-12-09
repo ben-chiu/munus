@@ -12,7 +12,7 @@
     <form action="/catalogue" method="POST">
         <div class="form-group">
           <select name="store" onchange="this.form.submit()">
-            <option value="all" selected>All Stores</option>
+            <option value="any" selected>All Stores</option>
             {% for s in stores %}
               {% if s == store %}
                 <option value="{{s}}" selected>{{ storeReplace.get(s,s) }}</option>
