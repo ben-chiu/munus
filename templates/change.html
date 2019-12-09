@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block main %}
+    <h1>Change Password</h1><br>
     <form action="/change" method="post">
         <div class="form-group">
             <input autocomplete="off" autofocus class="form-control" name="opassword" placeholder="Old Password" type="password">
@@ -15,6 +16,6 @@
         <div class="form-group">
             <input class="form-control" name="confirmation" placeholder="Confirm New Password" type="password">
         </div>
-        <button class="btn btn-primary" type="submit">Change</button>
+        <button class="btn btn-success" type="submit">Change</button>
     </form>
 {% endblock %}

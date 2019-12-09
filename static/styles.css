@@ -33,6 +33,34 @@ main img
     /* constrain images on small screens */
     max-width: 100%;
 }
+h1{
+  color: #014520;
+  text-decoration: underline #014520;
+}
+
+a{
+  color: #014520;
+}
+
+h2{
+  color: #015720;
+}
+
+h3{
+  color: #016920;
+}
+
+h4{
+  color: #017b20;
+}
+
+h5{
+  color: #018d20;
+}
+
+button{
+  background-color: #014520;
+}
 
 .formbox{
   margin: auto;
@@ -40,6 +68,7 @@ main img
   border-style: solid;
   border-color: #303944;
   border-width: 5px;
+  max-width: 700px;
   padding: 50px;
 }
 
@@ -58,5 +87,9 @@ main img
 }
 
 .darkgreen{
-  color: darkgreen;
+  color: #014520;
+}
+
+#welcome{
+  font-size: 60pt;
 }

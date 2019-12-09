@@ -5,10 +5,13 @@
 {% endblock %}
 
 {% block main %}
+    <h1>Payout</h1><br>
     <h2>Ready to empty your account?</h2><br>
     <h4>
-      <form action="/payout" method="POST">
-          <a class = "stripe-button" href = "https://connect.stripe.com/express/oauth/authorize?client_id=ca_GJxSsBCuYP6gJRyfQTrRlFOyZPziwBoR&redirect_uri=https://www.youtube.com/watch?v=oHg5SJYRHA0/">Click here to continue</a>
+      <form action="/payout" method="POST" id="payoutform">
+          <a class="btn btn-success btn-lg" href = "https://connect.stripe.com/express/oauth/authorize?client_id=ca_GJxSsBCuYP6gJRyfQTrRlFOyZPziwBoR&redirect_uri=https://www.youtube.com/watch?v=oHg5SJYRHA0/">Click here to continue</a>
       </form>
     </h4>
+    <p>Powered by Stripe</p>
+
 {% endblock %}

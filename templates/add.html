@@ -5,15 +5,17 @@
 {% endblock %}
 
 {% block main %}
+    <h1>Add Money</h1><br>
     <div class="formbox">
-      <h3>Add money to your account here:</h3>
+      <h2>Add money to your account here.</h2>
       <br>
+      <p>Enter the amount you want to add:<p>
       <form action="/payment" method="GET">
 
         <div class="form-group">
             <input autocomplete="off" autofocus class="form-control" name="amount" placeholder="Amount ($)" type="number" min="1">
         </div>
-        <button class="btn btn-primary" type="submit">Continue to Payment</button>
+        <button class="btn btn-success" type="submit">Continue to Payment</button>
       </form>
     </div>
 {% endblock %}

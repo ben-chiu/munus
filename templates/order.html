@@ -17,18 +17,19 @@
         <div class="form-group">
           <form action = {{ url }} method="POST">
             <label for="quantity">How many do you want?</label><br>
-            <input autocomplete="off" autofocus class="form-control" name="quantity" id ="quantity" placeholder="Quantity" type="number" min = "1" onchange="myfunction(this.value, {{ item[2] }})">
+            <input autocomplete="off" autofocus class="form-control" name="quantity" id ="quantity" value="1" placeholder="Quantity" type="number" min = "1" onchange="myfunction({{ item[2] }})">
             <script>
-              function myfunction(val, p) {
-                var price = p;
-                var quantity = val;
-                var tot = (price * quantity).toFixed(2);
+              function myfunction(val) {
+                var wtp = document.getElementById("wtp").value;
+                var quantity = document.getElementById("quantity").value;
+                var price = val;
+                var tot = ((price * quantity) + +wtp).toFixed(2);
                 document.getElementById("total").innerHTML="Total: $" + tot;
               }
             </script>
             <br><br>
             <label for="wtp">How much are you willing to pay to get this delivered to your door?</label><br>
-            <input autocomplete="off" autofocus class="form-control" name="wtp" id ="wtp" placeholder="Amount ($)" type="number" min = "0" step = '0.5'><br><br>
+            <input autocomplete="off" autofocus class="form-control" name="wtp" id ="wtp" placeholder="Amount ($)" type="number" min = "0" step = '0.5' value="0" onchange="myfunction({{ item[2] }})"><br><br>
             <label for="datefield">When should this order automatically expire?</label><br>
             <input autocomplete="off" autofocus class="form-control" name="datefield" id ="datefield" placeholder="Time" type="date" min="{{date}}"><br><br>
             <h4 id="total">Total: ${{ item[2] }}</h4><br><br>

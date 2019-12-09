@@ -12,7 +12,7 @@
     <form action="/catalogue" method="POST">
         <div class="form-group">
           <select name="store" onchange="this.form.submit()">
-            <option value="any" selected>Any store</option>
+            <option value="all" selected>All Stores</option>
             {% for s in stores %}
               {% if s == store %}
                 <option value="{{s}}" selected>{{ storeReplace.get(s,s) }}</option>
@@ -26,7 +26,7 @@
     </form>
     <br>
     {% if prod %}
-      <input class="form-control" type="text" id="searchBox" placeholder="Search for products..." onkeyup=filter()>
+    <i class="fa fa-search"></i>   <input class="form-control" type="text" id="searchBox" placeholder="Search for products..." onkeyup=filter()>
     {% endif %}
     <script>
         function filter() {

@@ -159,7 +159,7 @@ def login():
 
         # Ensure email was submitted
         if not request.form.get("email"):
-            flash("You must provid an email")
+            flash("You must provide an email.")
             return render_template("login.html")
 
         # Ensure password was submitted
@@ -173,7 +173,7 @@ def login():
 
         # Ensure email exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0][2], request.form.get("password")):
-            flash("invalid email and/or password")
+            flash("Invalid email and/or password.")
             return render_template("login.html")
 
         # Remember which user has logged in
@@ -346,7 +346,9 @@ def catalogue():
                     'swissbakers': 'Swissbakers',
                     'saloniki': 'Saloniki',
                     'dormcrew': 'Dorm Crew',
-                    'any': 'Any store'}
+                    'staples': 'Staples',
+                    'thecoop': 'The Coop',
+                    'any': 'All stores'}
 
     storeNames = [storeReplace.get(n,n) for n in stores]
 
@@ -453,7 +455,7 @@ def pickup():
         refund = vals[0]*vals[1] + vals[2]
 
         #flash that you picked up something
-        statement = "SELECT name FROM products WHERE id = {0}".format(request.args.get('pickedupID'))
+        statement = "SELECT name FROM products JOIN orders WHERE orders.id = {0}".format(request.args.get('pickedupID'))
         flash('Picked up ' + db.execute(statement).fetchone()[0])
         # add to balance
         balance = float(session['balance'].strip('$').replace(',',''))
@@ -553,11 +555,18 @@ def payout():
 
         payment_intent = stripe.PaymentIntent.create(
             payment_method_types = ['card'],
-            amount=1000,
+            amount=session["balance"], # pay them the money in their account
             currency='usd',
             transfer_data={'destination': '{{CONNECTED_STRIPE_ACCOUNT_ID}}',}
         )
-        return render_template('/')
+
+        #if Stripe authorizes transaction, then clear their account money
+        statement = "UPDATE users SET money=0 WHERE id={0}".format(session["user_id"])
+        db.execute(statment)
+        session["balance"] = usd(0)
+
+        flash("Payout successful")
+        return render_template('/', balane=session["balance"])
 
 def errorhandler(e):
     """Handle error"""

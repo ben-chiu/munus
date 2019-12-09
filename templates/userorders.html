@@ -6,7 +6,8 @@
 
 
 {% block main %}
-{% if rows|length > 0 %}
+  <h1>Your Open Orders</h1><br>
+  {% if rows|length > 0 %}
       <table class="table table-striped">
           <thead>
               <tr>
@@ -34,5 +35,5 @@
   {% else %}
       <h4>You have no current orders</h4>
   {% endif %}
-  <a href="/catalogue"><button class="btn btn-primary">Start a new order</button>
+  <a href="/catalogue"><button class="btn btn-success">Start a new order</button>
 {% endblock %}

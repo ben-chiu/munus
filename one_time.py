@@ -23,20 +23,22 @@ if a == 'display':
 if a=='dorm crew':
     db.execute("INSERT INTO products (store, name, price, id) VALUES ('dormcrew', 'Toilet Paper', 0, 19988);")
 
-if a in ['&pizza', 'saloniki','swissbakers','animezakka','crimsoncorner']:
+if a in ['&pizza', 'saloniki','swissbakers','animezakka','crimsoncorner', 'staples', 'thecoop']:
     f = open(a+'.txt', 'r')
     b = f.readline()
     b = f.readline()
+    count = 20000
     while b:
         print(b,'this is b')
         b = b.replace('\n','').split(', ')
-        statement = "INSERT INTO products (store, name, price) VALUES (\"{0}\", \"{1}\", {2});".format(a, b[0], b[1])
+        statement = "INSERT INTO products (store, name, price, id) VALUES (\"{0}\", \"{1}\", {2}, {3});".format(a, b[0], b[1], count)
         print(statement)
         try:
             db.execute(statement)
         except Exception as e:
             print(e)
         b = f.readline()
+        count+=1
 
 if a == 'a':
     print(db.execute("ALTER TABLE products ADD id INTEGER;"))

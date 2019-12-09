@@ -6,8 +6,7 @@
 
 {% block main %}
     <h2>Your orders are right around the corner!</h2><br>
-    <h4>Ready to add {{ dollars}}  to your Munus account.<br></h4>
-    <p>Click "Pay with Card" to continue:</p>
+    <h4>Ready to add {{ dollars}}  to your Munus account. Click "Pay with Card" to continue:</h4><br>
     <div>
       <form action="/charge" method="POST">
         <script
@@ -20,5 +19,6 @@
           data-locale = "auto">
         </script>
       </form>
+      <br><p>Powered by Stripe<p>
     </div>
 {% endblock %}

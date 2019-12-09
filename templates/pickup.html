@@ -14,13 +14,13 @@
 
 
 {% block main %}
-  <h2>Pickup</h2><br>
+  <h1>Pickup</h1><br>
   {% if infoList|length > 0 %}
   <h4>Current Orders</h4>
   <br>
 
   <div class="dropdown show" style="display:inline-block">
-    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <a class="btn btn-success dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Yard
     </a>
 
@@ -33,7 +33,7 @@
   </div>
 
   <div class="dropdown show" style="display:inline-block">
-    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <a class="btn btn-success dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Store
     </a>
 
@@ -47,9 +47,6 @@
       <a class="dropdown-item" href-"/pickup?filter=dormcrew">Dorm Crew</a>
     </div>
   </div>
-
-
-
 
   <br><br>
 
@@ -86,7 +83,7 @@
       <h4> There are no products for filter: {{ label }} </h4>
       <br><br>
       <form action='/pickup'>
-        <button class="btn btn-primary" type="submit">Return</button>
+        <button class="btn btn-success" type="submit">Return</button>
       </form>
   {% else %}
     <h4>Sorry, there are no current orders. Please check back soon!</h4>
