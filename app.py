@@ -557,6 +557,7 @@ def userorders():
         balance = float(session["balance"].strip("$").replace(',',''))
         newBalance = balance + refund;
         statement = "UPDATE users SET money='{0}' WHERE id='{1}';".format(newBalance, session["user_id"])
+        db.execute(statement)
         session["balance"] = usd(newBalance)
 
     # then load all outstanding orders (if one has just been canceled, it will not show up [which is what we want])
@@ -593,7 +594,7 @@ def payout():
         # only reachable if tester/user has a valid stripe account and can be paid
         # otherwise, their moeny won't be deleted from their account
         statement = "UPDATE users SET money=0 WHERE id={0}".format(session["user_id"])
-        db.execute(statment)
+        db.execute(statement)
         session["balance"] = usd(0)
         flash("Payout successful")
         return render_template('/', balane=session["balance"])
