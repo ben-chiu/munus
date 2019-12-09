@@ -70,7 +70,6 @@ if lastDay[:-2] != currDay:
     orders = db.execute("SELECT expir, id FROM orders;").fetchall()
     badOrders = []
     for i in orders:
-        print(i)
         if compareDays(i[0], currDay):
             badOrders.append(i[1])
 
@@ -468,7 +467,6 @@ def pickup():
         statement = "SELECT price, quantity, wtp, product_id FROM orders JOIN products ON product_id=products.id WHERE orders.id={0};".format(request.args.get("pickedupID"))
         #statement = "SELECT price, quantity, wtp, product_id FROM orders JOIN products ON product_id=products.id"
         vals = db.execute(statement).fetchone()
-        print(vals)
         refund = vals[0]*vals[1] + vals[2]
 
         #flash that you picked up something
