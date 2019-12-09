@@ -388,7 +388,7 @@ def catalogue():
 @login_required
 def suggested():
     #get list of all productIDs from history
-    statement = "SELECT product_id, COUNT(*) FROM history WHERE user_id={0} GROUP BY product_id".format(session["user_id"])
+    statement = "SELECT product_id, COUNT(*) FROM history WHERE user_id={0} AND type = 'ORDER' GROUP BY product_id".format(session["user_id"])
     instances = db.execute(statement).fetchall()
     instances.sort(key=itemgetter(1), reverse=True) # sort items based on number of times they have been ordered by that user
 
