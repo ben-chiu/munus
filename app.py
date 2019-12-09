@@ -1,9 +1,9 @@
 from __future__ import print_function
 import os
-import stripe
-
-
+import stripe # outside API for payment
 import sqlite3
+
+# import necessary components
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
 from flask_session import Session
 from tempfile import mkdtemp

@@ -1,4 +1,4 @@
-'''This document was used for various sql setup tasks (and a few other task)
+'''This document was used for various sqlite setup tasks (and a few other task)
  including, but not limited to, creating, updating, altering, and clearing,
  and deleting tables in the database'''
 
@@ -72,4 +72,6 @@ if a =='day':
     f.close()
 
 if a == 'delete':
-    db.execute("DELETE FROM orders WHERE expir = '';")
+    db.execute("DELETE FROM orders;")
+    db.execute("DELETE FROM users")
+    db.execute("DELETE FROM history")
