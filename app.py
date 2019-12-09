@@ -90,8 +90,6 @@ if lastDay[:-2] != currDay:
         db.execute(statement)
 
 # write into the file the current day
-
-
 f = open('day.txt', 'w')
 print(currDay, file=f)
 f.close()
@@ -207,15 +205,22 @@ def register():
     if request.method == "GET":
         return render_template("register.html")
     else:
+        #get information from forms
         e = request.form.get("email").lower()
+
+        # error checking
         if not e:
             flash("You must provide an email")
             return render_template("register.html")
+
+        # check for email already in use
         emails = db.execute("SELECT email FROM users").fetchall()  # list of dictionaries containing emails
         for d in emails:  # for a given dictionary
             if e == d[0]:  # check to see if already in use
                 flash("Email already in use")
                 return render_template("register.html")
+
+        #get more info from forms and check for errors
         password = request.form.get("password")
         confirmation = request.form.get("confirmation")
         building = request.form.get("building")
@@ -235,6 +240,8 @@ def register():
         if not room:
             flash("You must provide a room")
             return render_template("register.html")
+
+        # make a new Stripe customer
         cust = stripe.Customer.create(email=e)
         stripeid = cust["id"]
         hashval = generate_password_hash(password)
@@ -246,7 +253,7 @@ def register():
         statement = "SELECT id FROM users WHERE email='{0}'".format(e)
         session["user_id"] = db.execute(statement).fetchone()[0]
         session["stripe_id"] = stripeid
-        session["balance"] = usd(0)
+        session["balance"] = usd(0) #balance starts at 0
         return redirect("/add")
 
 
@@ -273,15 +280,18 @@ def payment():
 @app.route("/charge", methods=["POST"])
 @login_required
 def charge():
-    ''' might be incorrect with adding to history '''
     if request.method == "POST":
         a = session["add"]
         stripe.Customer.modify(session["stripe_id"], source=request.form["stripeToken"])
+
+        #create a Stripe charge
         charge = stripe.Charge.create(customer = session["stripe_id"], amount = a, currency = "usd", description="Munus deposit")
         statement = "SELECT money FROM users WHERE id = {0}".format(session['user_id'])
         current = db.execute(statement).fetchone()[0]
         balance = current + a/100
         session["balance"] = usd(balance)
+
+        #update databases
         statement = "UPDATE users SET money = {0} WHERE id = {1}".format(balance, session['user_id'])
         db.execute(statement)
         flash("Money added succesfully!")
@@ -292,6 +302,7 @@ def charge():
     else:
         return apology("Invalid access to page", 403)
 
+# shows that adding money was succesful
 @app.route("/success")
 @login_required
 def success():
@@ -304,11 +315,11 @@ def change():
     if request.method == "GET":
         return render_template("change.html", balance=session["balance"])
     else:
+        # get info from forms and check it for errors
         opassword = request.form.get("opassword")
         if not opassword:
             flash("You must provide your old password")
             return render_template("change.html")
-
         statement = "SELECT hash FROM users WHERE id = {0}".format(session["user_id"])
         h = db.execute(statement).fetchone()
         if not check_password_hash(h[0], opassword):
@@ -333,9 +344,12 @@ def change():
         flash('Password Changed!')
         return redirect("/")
 
+
+# is a catalogue of products from which the user can order, allows for searching for a product
 @app.route("/catalogue", methods=["GET", "POST"])
 @login_required
 def catalogue():
+    # gets all products
     statement = "SELECT DISTINCT store FROM products"
     storelist = db.execute(statement).fetchall()
     stores = [i[0] for i in storelist]
@@ -377,7 +391,7 @@ def suggested():
     #get list of all productIDs from history
     statement = "SELECT product_id, COUNT(*) FROM history WHERE user_id={0} GROUP BY product_id".format(session["user_id"])
     instances = db.execute(statement).fetchall()
-    instances.sort(key=itemgetter(1), reverse=True)
+    instances.sort(key=itemgetter(1), reverse=True) # sort items based on number of times they have been ordered by that user
 
     #add in corresponding names for sorted product ID list
     names = []
@@ -390,8 +404,11 @@ def suggested():
                 names.append(item[0])
                 names = [name.replace('\\\'','').replace('\\\"','') for name in names] # strips the backslashes from the names of the products
                 product_ids.append('/order?id='+str(product[0]))
+
+    #returning a list of products names and ids sorted according to that user's past orders
     return render_template("suggested.html", product_ids=product_ids, names=names, balance=session["balance"])
 
+# controls user ordering experience
 @app.route("/order", methods = ["GET", "POST"])
 @login_required
 def order():
@@ -402,14 +419,13 @@ def order():
         url = '/order?id='+str(item[3])
         return render_template("order.html", item = item, url = url, nOrd = True, date=date.today(), balance=session["balance"])
     elif request.method == "POST":
+        #get info from form
         expir = request.form.get("datefield")
-        print(expir)
         wtp = request.form.get("wtp")
         quantity = request.form.get("quantity")
 
         #if any of the forms are not filled out, send an error message and go back to the page
         if not expir or not wtp or not quantity:
-
             flash('Incomplete order!')
             statement = "SELECT * FROM products WHERE id = {0};".format(request.args.get("id"))
             item = db.execute(statement).fetchone()
@@ -418,31 +434,32 @@ def order():
 
         quantity = int(quantity)
 
+        # get all information about the product to be ordered
         statement = "SELECT * FROM products WHERE id = {0};".format(request.args.get("id"))
         item = db.execute(statement).fetchone()
 
-        print(float(wtp.replace(',','')))
-        print(float(item[2]))
-        print(type(quantity))
+        # making sure the user has enough money in their account to buy the product
         if (float(wtp.replace(',','')) + float(item[2])*quantity) > (float(session["balance"].strip("$").replace(',',''))):
             flash("Insufficient funds. Please add money.")
             return render_template("add.html", balance=session["balance"])
 
+        # update order databases in light of the new order
         statement = "INSERT INTO orders (user_id, product_id, wtp, expir, quantity) VALUES ({0}, {1}, {2}, '{3}', '{4}');".format(session['user_id'], item[3], wtp, expir, quantity)
         db.execute(statement)
 
+        # decrease users money
         statementAmt = "SELECT money FROM users WHERE id = {0}".format(session['user_id'])
         amt = db.execute(statementAmt).fetchone()[0]
-
         statement = "UPDATE users SET money = money - {0} WHERE id = {1}".format(float(wtp.replace(',','')) + float(item[2])*quantity, session['user_id'])
         db.execute(statement)
 
-        # this does work
+        # update session variable for balance
         session["balance"] = usd(amt - float(wtp.replace(',','')) - float(item[2]) * quantity)
 
         return render_template("ordered.html", item = item, balance=session["balance"])
 
 
+# controls all handling around the pickup of orders
 @app.route("/pickup", methods=["GET", "POST"])
 @login_required
 def pickup():
@@ -476,12 +493,16 @@ def pickup():
         statement = "DELETE FROM orders WHERE id='{0}';".format(request.args.get("pickedupID"))
         db.execute(statement)
 
+    # access database
     statement = "SELECT store, name, price, wtp, building, room, expir, quantity, orders.id FROM orders JOIN products ON product_id=products.id JOIN users ON orders.user_id=users.id WHERE user_id != {0} ORDER BY orders.wtp DESC".format(session['user_id'])
     totalLen = len(db.execute(statement).fetchall())
     label = ''
+
+    # get filter from url
     if request.args.get('filter'):
         filter = request.args.get('filter')
-        print(filter)
+
+        # assign dorms to the four yards and make query according to filters
         if filter in ('Ivy', 'Crimson', 'Elm', 'Oak'):
             dormToYard = {'Ivy': ('Apley Court', 'Hollis', 'Holworthy', 'Lionel', 'Mass Hall', 'Mower', 'Stoughton', 'Straus'),
                            'Crimson': ('Greenough', 'Hurlbut', 'Pennypacker', 'Wigglesworth'),
@@ -490,12 +511,12 @@ def pickup():
             yard = dormToYard[filter]
             label = filter + " Yard"
             statement = "SELECT store, name, price, wtp, building, room, expir, quantity, orders.id FROM orders JOIN products ON product_id=products.id JOIN users on orders.user_id=users.id WHERE users.building in {1} AND user_id != {0} ORDER BY orders.wtp DESC;".format(session['user_id'], dormToYard[filter])
-            print(statement)
+
         elif filter in ('CVS', 'saloniki','crimsoncorner','animezakka','swissbakers','&pizza', 'dormcrew'):
             label = filter
             statement = "SELECT store, name, price, wtp, building, room, expir, quantity, orders.id FROM orders JOIN products ON product_id=products.id JOIN users on orders.user_id=users.id WHERE products.store = '{1}' AND user_id != {0} ORDER BY orders.wtp DESC;".format(session['user_id'], filter)
-            print(statement)
 
+    # get and process info from database including making a list for if orders are expiring soon or not
     infoList = db.execute(statement).fetchall()
     current = date.today()
     expSoon = []
@@ -507,6 +528,7 @@ def pickup():
         else:
             expSoon.append("No")
 
+    # make a list of urls to with the orderID of the picked up order
     urls = []
     for i in range(len(infoList)):
         urls.append('/pickup?pickedupID=' + str(infoList[i][8]))
@@ -516,35 +538,42 @@ def pickup():
 
 
 
-
+# shows user orders they have currenlty placed (not expired), and allows for cancelation
 @app.route("/userorders")
 @login_required
 def userorders():
+    # first check to see if url contains a cancel request
     if (request.args.get("cancelId")):
-        #find value of order refund
+        # if an order has been cancelled
+        # find how much the refund should be
         statement = "SELECT price, quantity, wtp FROM orders JOIN products ON product_id=products.id WHERE orders.id='{0}'".format(request.args.get("cancelId"))
         vals = db.execute(statement).fetchone()
         refund = vals[0]*vals[1] + vals[2]
 
-        #delete order
+        # delete order from the orders database
         statement = "DELETE FROM orders WHERE id='{0}';".format(request.args.get("cancelId"))
         db.execute(statement)
 
-        #add refund back to balance
+        # add refund back to balance
         balance = float(session["balance"].strip("$").replace(',',''))
         newBalance = balance + refund;
         statement = "UPDATE users SET money='{0}' WHERE id='{1}';".format(newBalance, session["user_id"])
         session["balance"] = usd(newBalance)
+
+    # then load all outstanding orders (if one has just been canceled, it will not show up [which is what we want])
     statement = "SELECT orders.id, name, store, wtp, price, expir, quantity FROM orders JOIN products ON product_id=products.id WHERE user_id='{0}'".format(session["user_id"])
     rows = db.execute(statement).fetchall()
     return render_template("userorders.html", rows=rows, balance=session["balance"])
 
+# "pays" the user their outstanding balance through Stripe
+# you must have a Stripe account to get to the end of this method
 @app.route('/payout', methods = ['GET', 'POST'])
 @login_required
 def payout():
     if request.method == "GET":
         return render_template('payout.html', balance = session['balance'])
     else:
+    # use Stripe Connect API to pay the user into their Stripe Account
         response = stripe.OAuth.token(
             grant_type='authorization_code',
             code='ac_123456789',
@@ -553,6 +582,7 @@ def payout():
         # Access the connected account id in the response
         connected_account_id = response.stripe_user_id
 
+        # Create a PaymentIntent
         payment_intent = stripe.PaymentIntent.create(
             payment_method_types = ['card'],
             amount=session["balance"], # pay them the money in their account
@@ -560,14 +590,16 @@ def payout():
             transfer_data={'destination': '{{CONNECTED_STRIPE_ACCOUNT_ID}}',}
         )
 
-        #if Stripe authorizes transaction, then clear their account money
+        # if Stripe authorizes transaction, then clear their account money
+        # only reachable if tester/user has a valid stripe account and can be paid
+        # otherwise, their moeny won't be deleted from their account
         statement = "UPDATE users SET money=0 WHERE id={0}".format(session["user_id"])
         db.execute(statment)
         session["balance"] = usd(0)
-
         flash("Payout successful")
         return render_template('/', balane=session["balance"])
 
+# handles errors
 def errorhandler(e):
     """Handle error"""
     if not isinstance(e, HTTPException):
@@ -577,6 +609,3 @@ def errorhandler(e):
 # Listen for errors
 for code in default_exceptions:
     app.errorhandler(code)(errorhandler)
-
-#db.close()
-#database.close()
