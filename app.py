@@ -455,7 +455,7 @@ def pickup():
         refund = vals[0]*vals[1] + vals[2]
 
         #flash that you picked up something
-        statement = "SELECT name FROM products JOIN orders WHERE orders.id = {0}".format(request.args.get('pickedupID'))
+        statement = "SELECT name FROM orders JOIN products ON product_id = products.id WHERE orders.id = {0}".format(request.args.get('pickedupID'))
         flash('Picked up ' + db.execute(statement).fetchone()[0])
         # add to balance
         balance = float(session['balance'].strip('$').replace(',',''))
