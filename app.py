@@ -476,6 +476,7 @@ def pickup():
         balance = float(session['balance'].strip('$').replace(',',''))
         nB = balance + refund
         statement = "UPDATE USERS set money = {0} WHERE id = '{1}';".format(nB, session['user_id'])
+        db.execute(statement)
         session['balance'] = usd(nB)
 
         # add to orderer history
