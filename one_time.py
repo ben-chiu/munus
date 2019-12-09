@@ -1,3 +1,7 @@
+'''This document was used for various sql setup tasks (and a few other task)
+ including, but not limited to, creating, updating, altering, and clearing,
+ and deleting tables in the database'''
+
 import sqlite3
 import time
 from datetime import date
